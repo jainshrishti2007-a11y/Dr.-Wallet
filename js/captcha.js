@@ -1,10 +1,10 @@
 /*==========================================
   CAPTCHA WIDGET
-  Pure JS + CSS, no image or backend needed.
+
 ==========================================*/
 
 function generateCaptchaText(length = 6) {
-    // Avoids visually confusing characters like 0/O, 1/I, l
+    
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     let text = "";
     for (let i = 0; i < length; i++) {

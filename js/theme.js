@@ -1,9 +1,6 @@
 /*==========================================
   DR. WALLET — THEME TOGGLE
-  The initial theme is applied by a tiny inline script
-  in <head> (before CSS paints) to avoid a flash of the
-  wrong theme. This file just wires up the button click
-  and remembers the choice for next time.
+  
 ==========================================*/
 
 const THEME_KEY = "drwallet_theme";

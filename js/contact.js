@@ -1,10 +1,6 @@
 /*==========================================
   CONTACT FORM LOGIC
-  Note: there's no backend behind this site, so this
-  validates the form and shows a confirmation — it doesn't
-  actually deliver the message anywhere yet. Swap the
-  TODO block below for a real endpoint (e.g. Formspree,
-  EmailJS, or your own API) when you're ready to receive these.
+
 ==========================================*/
 
 function setContactError(field, message) {
@@ -60,8 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // TODO: replace this with a real submission (Formspree / EmailJS / your own API).
-        // For now this just confirms locally, since the site has no backend yet.
+      
         form.reset();
         showToast(`Thanks ${name.split(" ")[0]}, your message is ready to send!`, "success");
     });
@@ -69,8 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /*==========================================
   SCROLL REVEAL
-  Fades in the info cards, form panels and FAQ
-  items as they enter the viewport.
+ 
 ==========================================*/
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -103,14 +103,12 @@ document.addEventListener("DOMContentLoaded", () => {
         users.push(newUser);
         saveUsers(users);
 
-        // Log them straight in — no reason to make them re-enter
-        // the same details on the sign-in page right after signup.
         setSession(newUser);
 
         showToast(`Welcome, ${name.split(" ")[0]}! Taking you to your dashboard…`, "success");
 
         setTimeout(() => {
-            window.location.href = "dashboard.html";
+            window.location.href = "home.html";
         }, 1200);
     });
 });

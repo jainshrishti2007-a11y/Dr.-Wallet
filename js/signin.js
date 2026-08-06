@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("Successfully logged in!", "success");
 
         setTimeout(() => {
-            window.location.href = "dashboard.html";
+            window.location.href = "home.html";
         }, 1200);
     });
 });

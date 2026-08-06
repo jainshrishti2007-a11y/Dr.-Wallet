@@ -1,7 +1,6 @@
 /*==========================================
   DR. WALLET — AUTH & SESSION MANAGER
-  Included on every page. Keeps the navbar in sync
-  with whether someone is logged in or not.
+
 ==========================================*/
 
 const USERS_KEY = "drwallet_users";
@@ -72,9 +71,7 @@ function showToast(message, type = "success") {
 }
 
 /* ---------- navbar: logged-in vs guest ----------
-   Rendered into every matching container on the page — normally that's
-   #authSlot (desktop navbar) and #authSlotMobile (inside the mobile
-   dropdown menu), so account access works at every screen size. */
+   . */
 
 function buildGuestHTML() {
     return `
