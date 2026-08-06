@@ -1,0 +1,157 @@
+/*==========================================
+  DR. WALLET — DESIGN TOKENS
+  Shared by every page. Change once, updates everywhere.
+==========================================*/
+
+:root{
+
+    /* ---- surfaces ---- */
+    --color-bg:#F7FAFC;
+    --color-surface:#FFFFFF;
+    --color-surface-alt:#F8FAFC;
+    --color-border:#E2E8F0;
+
+    /* ---- brand ---- */
+    --color-primary:#2563EB;
+    --color-primary-dark:#1D4ED8;
+    --color-primary-light:#3B82F6;
+    --color-primary-tint:#DBEAFE;
+
+    /* ---- money semantics: green = saved, amber = warning, red = overspent ---- */
+    --color-accent:#10B981;
+    --color-accent-tint:#D1FAE5;
+    --color-warning:#F59E0B;
+    --color-warning-tint:#FEF3C7;
+    --color-danger:#EF4444;
+    --color-danger-tint:#FEE2E2;
+
+    /* ---- ink ---- */
+    --color-ink:#0F172A;
+    --color-slate:#64748B;
+    --color-slate-light:#94A3B8;
+
+    /* ---- type ---- */
+    --font-display:'Sora', sans-serif;
+    --font-body:'Poppins', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+
+    /* ---- shape ---- */
+    --radius-sm:12px;
+    --radius-md:20px;
+    --radius-lg:28px;
+    --radius-pill:999px;
+
+    /* ---- elevation ---- */
+    --shadow-sm:0 8px 20px rgba(15,23,42,.06);
+    --shadow-md:0 20px 40px rgba(15,23,42,.08);
+    --shadow-lg:0 30px 60px rgba(15,23,42,.14);
+
+    /* ---- glass surfaces (navbar, flip-card) — swap for dark translucency in dark mode ---- */
+    --glass-navbar-bg:rgba(255,255,255,.7);
+    --glass-navbar-border:rgba(255,255,255,.4);
+    --glass-mobile-menu-bg:rgba(255,255,255,.96);
+    --glass-card-start:rgba(255,255,255,.82);
+    --glass-card-end:rgba(255,255,255,.42);
+    --glass-card-border:rgba(255,255,255,.7);
+    --glass-card-shine:rgba(255,255,255,.5);
+    --glass-card-inset:rgba(255,255,255,.8);
+    --glass-flip-btn-bg:rgba(255,255,255,.7);
+
+    /* ---- fixed-dark surfaces (footer, badges) — always dark, never flips with theme ---- */
+    --color-fixed-dark:#0F172A;
+
+    /* ---- layout ---- */
+    --container:1280px;
+}
+
+/*==========================================
+  DARK THEME
+  Toggled by setting data-theme="dark" on <html>.
+  See js/theme.js
+==========================================*/
+
+:root[data-theme="dark"]{
+
+    --color-bg:#0B1120;
+    --color-surface:#131C2E;
+    --color-surface-alt:#1A2540;
+    --color-border:#2A3655;
+
+    --color-primary:#3B82F6;
+    --color-primary-dark:#2563EB;
+    --color-primary-light:#60A5FA;
+    --color-primary-tint:rgba(59,130,246,.18);
+
+    --color-accent:#34D399;
+    --color-accent-tint:rgba(16,185,129,.18);
+    --color-warning:#FBBF24;
+    --color-warning-tint:rgba(245,158,11,.18);
+    --color-danger:#F87171;
+    --color-danger-tint:rgba(239,68,68,.18);
+
+    --color-ink:#F1F5F9;
+    --color-slate:#94A3B8;
+    --color-slate-light:#64748B;
+
+    --shadow-sm:0 8px 20px rgba(0,0,0,.35);
+    --shadow-md:0 20px 40px rgba(0,0,0,.4);
+    --shadow-lg:0 30px 60px rgba(0,0,0,.5);
+
+    --glass-navbar-bg:rgba(19,28,46,.75);
+    --glass-navbar-border:rgba(255,255,255,.08);
+    --glass-mobile-menu-bg:rgba(19,28,46,.97);
+    --glass-card-start:rgba(30,41,59,.78);
+    --glass-card-end:rgba(17,24,39,.5);
+    --glass-card-border:rgba(255,255,255,.08);
+    --glass-card-shine:rgba(255,255,255,.05);
+    --glass-card-inset:rgba(255,255,255,.05);
+    --glass-flip-btn-bg:rgba(255,255,255,.08);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:var(--font-body);
+    background:var(--color-bg);
+    color:var(--color-ink);
+    overflow-x:hidden;
+    transition:background-color .35s ease, color .35s ease;
+}
+
+a{
+    text-decoration:none;
+    color:inherit;
+}
+
+ul{
+    list-style:none;
+}
+
+img{
+    max-width:100%;
+    display:block;
+}
+
+button{
+    font-family:inherit;
+    cursor:pointer;
+}
+
+:focus-visible{
+    outline:3px solid var(--color-primary-light);
+    outline-offset:3px;
+}
+
+.container{
+    max-width:var(--container);
+    margin:0 auto;
+    padding:0 8%;
+}

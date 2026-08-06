@@ -1,0 +1,102 @@
+/*==========================================
+  SHARED RESPONSIVE RULES
+  (page-specific breakpoints live in each page's own css)
+==========================================*/
+
+@media(max-width:992px){
+
+    .nav-toggle-label{
+        display:flex;
+    }
+
+    .nav-links{
+        position:absolute;
+        top:calc(100% + 14px);
+        left:0;
+        right:0;
+        flex-direction:column;
+        background:var(--glass-mobile-menu-bg);
+        backdrop-filter:blur(18px);
+        border-radius:var(--radius-md);
+        padding:26px;
+        gap:20px;
+        box-shadow:var(--shadow-md);
+        opacity:0;
+        transform:translateY(-12px);
+        pointer-events:none;
+        transition:.3s;
+    }
+
+    .nav-toggle:checked ~ .nav-links{
+        opacity:1;
+        transform:translateY(0);
+        pointer-events:auto;
+    }
+
+    .nav-toggle:checked ~ .nav-toggle-label span:nth-child(1){
+        transform:translateY(7px) rotate(45deg);
+    }
+
+    .nav-toggle:checked ~ .nav-toggle-label span:nth-child(2){
+        opacity:0;
+    }
+
+    .nav-toggle:checked ~ .nav-toggle-label span:nth-child(3){
+        transform:translateY(-7px) rotate(-45deg);
+    }
+
+    .nav-buttons #authSlot{
+        display:none;
+    }
+
+    .mobile-auth-slot{
+        display:block;
+        margin-top:6px;
+        padding-top:20px;
+        border-top:1px solid var(--color-border);
+    }
+
+    .mobile-auth-slot #authSlotMobile{
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+    }
+
+    .mobile-auth-slot .user-menu{
+        width:100%;
+    }
+
+    .mobile-auth-slot .user-avatar-btn{
+        width:100%;
+        justify-content:space-between;
+    }
+}
+
+@media(max-width:768px){
+
+    .cta{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .footer-top{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .footer-bottom{
+        flex-direction:column;
+        gap:10px;
+        text-align:center;
+    }
+}
+
+@media(max-width:520px){
+
+    .section-head h2{
+        font-size:32px;
+    }
+
+    .footer-top{
+        grid-template-columns:1fr;
+    }
+}

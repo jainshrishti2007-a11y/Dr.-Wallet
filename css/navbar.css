@@ -1,0 +1,199 @@
+/*==========================================
+  NAVBAR (fixed, floating pill)
+==========================================*/
+
+.site-header{
+    position:fixed;
+    top:22px;
+    left:50%;
+    transform:translateX(-50%);
+    width:90%;
+    max-width:var(--container);
+    z-index:1000;
+}
+
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 32px;
+    background:var(--glass-navbar-bg);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:1px solid var(--glass-navbar-border);
+    border-radius:var(--radius-pill);
+    box-shadow:var(--shadow-md);
+    transition:background .35s ease, border-color .35s ease;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:26px;
+    font-weight:700;
+    color:var(--color-ink);
+    font-family:var(--font-display);
+}
+
+.logo i{
+    color:var(--color-primary);
+}
+
+.nav-links{
+    display:flex;
+    gap:36px;
+}
+
+.nav-links a{
+    color:#334155;
+    font-weight:500;
+    font-size:15px;
+    position:relative;
+    transition:.3s;
+}
+
+.nav-links a::after{
+    content:"";
+    position:absolute;
+    width:0;
+    height:2px;
+    left:0;
+    bottom:-6px;
+    background:var(--color-primary);
+    transition:.3s;
+}
+
+.nav-links a:hover{
+    color:var(--color-primary);
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after{
+    width:100%;
+}
+
+.nav-buttons{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.btn{
+    padding:12px 26px;
+    border-radius:var(--radius-pill);
+    font-weight:600;
+    font-size:14.5px;
+    transition:.3s;
+    border:none;
+    display:inline-block;
+}
+
+.btn-ghost{
+    border:2px solid var(--color-border);
+    color:var(--color-ink);
+    background:transparent;
+}
+
+.btn-ghost:hover{
+    border-color:var(--color-primary);
+    background:var(--color-surface);
+}
+
+.btn-primary{
+    background:var(--color-primary);
+    color:#fff;
+    box-shadow:0 12px 22px rgba(37,99,235,.3);
+}
+
+.btn-primary:hover{
+    background:var(--color-primary-dark);
+    transform:translateY(-3px);
+}
+
+.btn-logout{
+    border:2px solid var(--color-danger-tint);
+    color:var(--color-danger);
+    background:var(--color-danger-tint);
+}
+
+.btn-logout:hover{
+    background:var(--color-danger);
+    color:#fff;
+    border-color:var(--color-danger);
+}
+
+/* authSlot is a wrapper only for JS to target — it must not affect
+   the flex layout of .nav-buttons, so its children (guest buttons or
+   the user menu) lay out as if they were direct children. */
+#authSlot{
+    display:contents;
+}
+
+/* Lives inside the mobile dropdown menu; only shown on small screens
+   (see responsive.css) so account access works there too. */
+.mobile-auth-slot{
+    display:none;
+}
+
+/*==========================================
+  THEME TOGGLE (light / dark)
+==========================================*/
+
+.theme-toggle{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:var(--color-surface-alt);
+    border:1px solid var(--color-border);
+    color:var(--color-ink);
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    transition:.3s;
+}
+
+.theme-toggle:hover{
+    border-color:var(--color-primary);
+    color:var(--color-primary);
+    transform:rotate(15deg);
+}
+
+.theme-toggle .fa-sun{
+    display:none;
+}
+
+:root[data-theme="dark"] .theme-toggle .fa-sun{
+    display:inline-block;
+    color:var(--color-warning);
+}
+
+:root[data-theme="dark"] .theme-toggle .fa-moon{
+    display:none;
+}
+
+/*==========================================
+  MOBILE TOGGLE (pure CSS, no JS)
+==========================================*/
+
+.nav-toggle{
+    display:none;
+}
+
+.nav-toggle-label{
+    display:none;
+    flex-direction:column;
+    gap:5px;
+    cursor:pointer;
+    z-index:1200;
+}
+
+.nav-toggle-label span{
+    width:26px;
+    height:2px;
+    background:var(--color-ink);
+    border-radius:2px;
+    transition:.3s;
+}

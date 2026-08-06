@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Apply saved theme before paint, to avoid a flash of the wrong theme -->
+    <script>
+        (function () {
+            var saved = localStorage.getItem("drwallet_theme");
+            var theme = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Dr. Wallet</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/forms.css">
+    <link rel="stylesheet" href="css/signup.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+</head>
+<body>
+
+    <header class="site-header">
+        <nav class="navbar">
+
+            <a href="home.html" class="logo">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Dr. Wallet</span>
+            </a>
+
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">
+                <span></span><span></span><span></span>
+            </label>
+
+            <ul class="nav-links">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="home.html#about">About</a></li>
+                <li><a href="home.html#features">Features</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li class="mobile-auth-slot">
+                    <div id="authSlotMobile"></div>
+                </li>
+            </ul>
+
+            <div class="nav-buttons">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <i class="fa-solid fa-sun"></i>
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <div id="authSlot">
+                    <a href="signin.html" class="btn btn-ghost">Sign In</a>
+                    <a href="signup.html" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+
+        </nav>
+    </header>
+
+    <main class="auth-wrap">
+
+        <div class="auth-card signup-card">
+
+            <div class="auth-head">
+                <a href="home.html" class="logo">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Dr. Wallet</span>
+                </a>
+                <h1>Create your account</h1>
+                <p>Takes less than two minutes. Free forever for students.</p>
+            </div>
+
+            <form id="signupForm" novalidate>
+
+                <div class="form-grid">
+
+                    <div class="form-group full">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" name="name" placeholder="e.g. Aditi Sharma" autocomplete="name">
+                        <span class="error-text" data-error-for="name"></span>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email">
+                        <span class="error-text" data-error-for="email"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" placeholder="10-digit mobile number" autocomplete="tel" maxlength="10">
+                        <span class="error-text" data-error-for="phone"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pincode">Pincode *</label>
+                        <input type="text" id="pincode" name="pincode" placeholder="6-digit pincode" maxlength="6">
+                        <span class="error-text" data-error-for="pincode"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password *</label>
+                        <div class="password-field">
+                            <input type="password" id="password" name="password" placeholder="At least 8 characters" autocomplete="new-password">
+                            <button type="button" class="toggle-password"><i class="fa-solid fa-eye"></i></button>
+                        </div>
+                        <span class="error-text" data-error-for="password"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password *</label>
+                        <div class="password-field">
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password" autocomplete="new-password">
+                            <button type="button" class="toggle-password"><i class="fa-solid fa-eye"></i></button>
+                        </div>
+                        <span class="error-text" data-error-for="confirmPassword"></span>
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Captcha *</label>
+                        <div class="captcha-row">
+                            <div class="captcha-box" id="captchaText"></div>
+                            <button type="button" class="captcha-refresh" id="refreshCaptcha" aria-label="Refresh captcha">
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+                        </div>
+                        <input type="text" id="captcha" name="captcha" placeholder="Enter the code shown above" autocomplete="off">
+                        <span class="error-text" data-error-for="captcha"></span>
+                    </div>
+
+                    <div class="section-divider">Optional details</div>
+
+                    <div class="form-group">
+                        <label for="college">College / School <span class="optional-tag">(optional)</span></label>
+                        <input type="text" id="college" name="college" placeholder="e.g. Punjabi University">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentClass">Class <span class="optional-tag">(optional)</span></label>
+                        <input type="text" id="studentClass" name="studentClass" placeholder="e.g. 2nd Year / Class 12">
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary auth-submit">Create Account</button>
+
+            </form>
+
+            <p class="auth-switch">Already have an account? <a href="signin.html">Sign In</a></p>
+
+        </div>
+
+    </main>
+
+    <div id="toast-container"></div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/captcha.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/signup.js"></script>
+
+</body>
+</html>

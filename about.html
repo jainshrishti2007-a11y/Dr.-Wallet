@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Apply saved theme before paint, to avoid a flash of the wrong theme -->
+    <script>
+        (function () {
+            var saved = localStorage.getItem("drwallet_theme");
+            var theme = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Dr. Wallet</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/about.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+</head>
+<body>
+
+    <header class="site-header">
+        <nav class="navbar">
+
+            <a href="home.html" class="logo">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Dr. Wallet</span>
+            </a>
+
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">
+                <span></span><span></span><span></span>
+            </label>
+
+            <ul class="nav-links">
+                <li><a href="home.html">Home</a></li>
+                <li id="navDashboardLink" style="display:none"><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="home.html#features">Features</a></li>
+                <li><a href="about.html" class="active">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li class="mobile-auth-slot">
+                    <div id="authSlotMobile"></div>
+                </li>
+            </ul>
+
+            <div class="nav-buttons">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <i class="fa-solid fa-sun"></i>
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <div id="authSlot">
+                    <a href="signin.html" class="btn btn-ghost">Sign In</a>
+                    <a href="signup.html" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- =========================
+                HERO
+        ========================== -->
+
+        <section class="about-hero">
+            <span class="eyebrow">ABOUT DR. WALLET</span>
+            <h1>Built by a student who kept <em>losing track</em> of ₹100 coffees.</h1>
+            <p>Dr. Wallet started as a way to stop guessing where the month's allowance went — now it's a small, honest tool for anyone tired of budgeting apps built for salaries, not students.</p>
+        </section>
+
+        <!-- =========================
+                STORY
+        ========================== -->
+
+        <section class="story">
+            <div class="container">
+
+                <div class="story-content">
+                    <span class="eyebrow">THE STORY</span>
+                    <h2>Every app felt like it was built for someone else's money.</h2>
+                    <p>
+                        Most expense trackers assume a salary, an office commute and a fixed monthly rent. Student life doesn't look like that — it's an allowance that has to stretch, a mess bill that hits all at once, and the same ₹100 coffee that quietly adds up without ever feeling like "real spending."
+                    </p>
+                    <p>
+                        Dr. Wallet was built to fit that reality instead of fighting it — fast enough to log an expense between classes, and smart enough to notice when a habit (hello, daily chai) deserves its own spotlight.
+                    </p>
+                </div>
+
+                <div class="story-visual">
+                    <div class="receipt-card">
+                        <div class="receipt-head">
+                            DR. WALLET
+                            <span>Today's Spending</span>
+                        </div>
+                        <div class="receipt-row"><span>☕ Coffee</span><span>₹100</span></div>
+                        <div class="receipt-row"><span>🚌 Bus fare</span><span>₹30</span></div>
+                        <div class="receipt-row"><span>🍽️ Canteen lunch</span><span>₹120</span></div>
+                        <div class="receipt-row"><span>📚 Notebook</span><span>₹60</span></div>
+                        <div class="receipt-total"><span>Total</span><span>₹310</span></div>
+                        <div class="receipt-note">✓ Logged in under 30 seconds</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================
+                HOW IT WORKS
+        ========================== -->
+
+        <section class="how-it-works">
+
+            <div class="section-head">
+                <span class="eyebrow">HOW IT WORKS</span>
+                <h2>From allowance to insight, in four steps</h2>
+            </div>
+
+            <div class="steps-grid">
+
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Set a Budget</h3>
+                    <p>Tell Dr. Wallet how much you've got for the month. That's your starting line.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Log as You Spend</h3>
+                    <p>Type what you bought — the category and emoji are detected automatically.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Spot the Patterns</h3>
+                    <p>Repeat buys get flagged as Hot Topics, and your weekly graph &amp; pie chart do the rest.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>Stay in Control</h3>
+                    <p>Watch your budget bar in real time and know exactly what's left before month-end.</p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =========================
+                VALUES
+        ========================== -->
+
+        <section class="values">
+
+            <div class="section-head">
+                <span class="eyebrow">WHAT WE CARE ABOUT</span>
+                <h2>The principles behind Dr. Wallet</h2>
+            </div>
+
+            <div class="values-grid">
+
+                <div class="value-card">
+                    <div class="value-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <h3>Fast, Not Fussy</h3>
+                    <p>If logging an expense takes longer than buying it, the app has failed. Everything is built around speed.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon"><i class="fa-solid fa-lock"></i></div>
+                    <h3>Private by Design</h3>
+                    <p>Your data lives in your own browser. No servers, no accounts sold, nothing tracked behind your back.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <h3>Made for Student Life</h3>
+                    <p>Mess fees, hostel rent, fest budgets — the categories and defaults are built around how students actually spend.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon"><i class="fa-solid fa-heart"></i></div>
+                    <h3>Free, Always</h3>
+                    <p>No premium tier, no paywalled charts. A budgeting tool shouldn't cost the very money it's helping you save.</p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =========================
+                CREATOR NOTE
+        ========================== -->
+
+        <section class="creator">
+
+            <div class="creator-card">
+                <i class="fa-solid fa-quote-left"></i>
+                <blockquote>
+                    "I built Dr. Wallet because I was tired of opening five different apps just to figure out where my allowance went. It's small, it's still growing, and it's genuinely built to be used — not just demoed."
+                </blockquote>
+                <div class="creator-identity">
+                    <div class="creator-avatar">SS</div>
+                    <div>
+                        <b>Shikhar Sharma</b>
+                        <span>Creator, Dr. Wallet</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- =========================
+                CTA
+        ========================== -->
+
+        <section class="cta">
+            <div class="cta-text">
+                <h2>Ready to actually know where your money goes?</h2>
+                <p>Free to use. Built for students. Set up in under two minutes.</p>
+            </div>
+            <a href="signup.html" class="btn js-signup-cta">Create Free Account</a>
+        </section>
+
+    </main>
+
+    <!-- =========================
+            FOOTER
+    ========================== -->
+
+    <footer class="site-footer">
+
+        <div class="footer-top">
+
+            <div class="footer-brand">
+                <a href="home.html" class="logo">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Dr. Wallet</span>
+                </a>
+                <p>A simple, student-first expense tracker built to make budgeting one less thing to stress about.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="home.html#features">Features</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="signup.html" class="js-signup-cta">Sign Up</a></li>
+                    <li><a href="signin.html">Sign In</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Dr. Wallet. Built as a student project.</span>
+            <span>Made with <i class="fa-solid fa-heart" style="color:#EF4444"></i> for students who overspend on chai.</span>
+        </div>
+
+    </footer>
+
+    <div id="toast-container"></div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/auth.js"></script>
+
+</body>
+</html>

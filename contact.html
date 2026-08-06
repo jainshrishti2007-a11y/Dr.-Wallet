@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Apply saved theme before paint, to avoid a flash of the wrong theme -->
+    <script>
+        (function () {
+            var saved = localStorage.getItem("drwallet_theme");
+            var theme = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Dr. Wallet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <!-- Page CSS -->
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+</head>
+<body>
+
+    <!-- ======================================
+            NAVBAR
+    ====================================== -->
+
+    <header class="site-header">
+        <nav class="navbar">
+
+            <a href="home.html" class="logo">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Dr. Wallet</span>
+            </a>
+
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">
+                <span></span><span></span><span></span>
+            </label>
+
+            <ul class="nav-links">
+                <li><a href="home.html">Home</a></li>
+                <li id="navDashboardLink" style="display:none"><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="home.html#features">Features</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+                <li class="mobile-auth-slot">
+                    <div id="authSlotMobile"></div>
+                </li>
+            </ul>
+
+            <div class="nav-buttons">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <i class="fa-solid fa-sun"></i>
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <div id="authSlot">
+                    <a href="signin.html" class="btn btn-ghost">Sign In</a>
+                    <a href="signup.html" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- ======================================
+                HERO
+        ====================================== -->
+
+        <section class="contact-hero">
+            <div class="hero-content">
+                <span class="eyebrow">CONTACT US</span>
+                <h1>We'd Love To <span>Hear From You.</span></h1>
+                <p>Have a question, suggestion or feedback? Fill out the form below and we'll get back to you as soon as possible.</p>
+            </div>
+        </section>
+
+        <!-- ======================================
+                CONTACT INFO
+        ====================================== -->
+
+        <section class="contact-info">
+
+            <div class="info-card">
+                <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
+                <h3>Email</h3>
+                <p>support@drwallet.com</p>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+                <h3>Location</h3>
+                <p>India</p>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon"><i class="fa-solid fa-clock"></i></div>
+                <h3>Response Time</h3>
+                <p>Within 24 Hours</p>
+            </div>
+
+        </section>
+
+        <!-- ======================================
+                CONTACT FORM
+        ====================================== -->
+
+        <section class="contact-section">
+
+            <div class="contact-container">
+
+                <div class="contact-left">
+
+                    <span class="eyebrow">GET IN TOUCH</span>
+                    <h2>Send Us A Message</h2>
+                    <p>Whether you've found a bug, have an idea for a new feature, or simply want to say hello, we'd love to hear from you.</p>
+
+                    <ul class="contact-list">
+                        <li><i class="fa-solid fa-circle-check"></i> Student Friendly</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Secure Platform</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Fast Response</li>
+                    </ul>
+
+                </div>
+
+                <div class="contact-right">
+
+                    <form id="contactForm" novalidate>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contactName">Full Name</label>
+                                <input type="text" id="contactName" name="name" placeholder="Enter your name">
+                                <span class="error-text" data-error-for="name"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contactEmail">Email Address</label>
+                                <input type="email" id="contactEmail" name="email" placeholder="Enter your email">
+                                <span class="error-text" data-error-for="email"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contactSubject">Subject</label>
+                            <input type="text" id="contactSubject" name="subject" placeholder="Enter subject">
+                            <span class="error-text" data-error-for="subject"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contactMessage">Your Message</label>
+                            <textarea id="contactMessage" name="message" rows="7" placeholder="Write your message..."></textarea>
+                            <span class="error-text" data-error-for="message"></span>
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fa-solid fa-paper-plane"></i> Send Message
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ======================================
+                FAQ
+        ====================================== -->
+
+        <section class="faq-section">
+
+            <div class="section-head">
+                <span class="eyebrow">FAQ</span>
+                <h2>Frequently Asked Questions</h2>
+            </div>
+
+            <div class="faq-container">
+
+                <details>
+                    <summary>Is Dr. Wallet free? <i class="fa-solid fa-plus"></i></summary>
+                    <p>Yes — completely free, with no premium tier. Budgeting shouldn't cost the money it's helping you save.</p>
+                </details>
+
+                <details>
+                    <summary>Is my data secure? <i class="fa-solid fa-plus"></i></summary>
+                    <p>Your budget and expenses are stored locally in your own browser (localStorage), tied to your account. Nothing is sent to a server, and no one else can see it.</p>
+                </details>
+
+                <details>
+                    <summary>Will my data sync across devices? <i class="fa-solid fa-plus"></i></summary>
+                    <p>Not yet — since everything is stored in your browser rather than a server, your data currently stays on the device you added it from. Cross-device sync is on the roadmap.</p>
+                </details>
+
+                <details>
+                    <summary>Can I edit or delete my expenses later? <i class="fa-solid fa-plus"></i></summary>
+                    <p>Yes. Every transaction in your dashboard ledger has a delete button, and you can update your budget anytime from the "Edit Budget" option.</p>
+                </details>
+
+                <details>
+                    <summary>How does the "Hot Topics" feature work? <i class="fa-solid fa-plus"></i></summary>
+                    <p>If you log the same item three or more times — even typed slightly differently, like "coff" and "coffee" — Dr. Wallet groups them and surfaces it as a one-tap quick-add chip, so recurring buys take a single tap instead of a full form.</p>
+                </details>
+
+                <details>
+                    <summary>Can I use this on mobile? <i class="fa-solid fa-plus"></i></summary>
+                    <p>Absolutely. Dr. Wallet is fully responsive and works across phones, tablets and desktops.</p>
+                </details>
+
+                <details>
+                    <summary>Do I need to make an account? <i class="fa-solid fa-plus"></i></summary>
+                    <p>Yes — a free account lets Dr. Wallet keep your budget and expenses tied to you specifically, rather than mixed up with anyone else using the same browser.</p>
+                </details>
+
+            </div>
+
+        </section>
+
+        <!-- ======================================
+                CTA
+        ====================================== -->
+
+        <section class="cta">
+            <div class="cta-text">
+                <h2>Start Managing Your Money Smarter.</h2>
+                <p>Join students taking control of their expenses, one honest ledger at a time.</p>
+            </div>
+            <a href="signup.html" class="btn js-signup-cta">Create Free Account</a>
+        </section>
+
+    </main>
+
+    <!-- ======================================
+            FOOTER
+    ====================================== -->
+
+    <footer class="site-footer">
+
+        <div class="footer-top">
+
+            <div class="footer-brand">
+                <a href="home.html" class="logo">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Dr. Wallet</span>
+                </a>
+                <p>A student-first expense tracker designed to simplify budgeting and make financial management easy.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="home.html#features">Features</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="signup.html" class="js-signup-cta">Sign Up</a></li>
+                    <li><a href="signin.html">Sign In</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Dr. Wallet. Built as a student project.</span>
+            <span>Made with <i class="fa-solid fa-heart" style="color:#EF4444"></i> for students.</span>
+        </div>
+
+    </footer>
+
+    <div id="toast-container"></div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/contact.js"></script>
+
+</body>
+</html>

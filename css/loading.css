@@ -1,0 +1,149 @@
+/*========================
+GLOBAL
+=========================*/
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    width:100%;
+    height:100vh;
+
+    background:linear-gradient(135deg,#2563EB,#1E3A8A);
+
+    overflow:hidden;
+
+}
+
+/*========================
+MAIN CONTAINER
+=========================*/
+
+.loader-container{
+
+    text-align:center;
+
+    color:white;
+
+}
+
+/*========================
+LOGO
+=========================*/
+
+.wallet{
+
+    width:120px;
+    height:120px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:55px;
+
+    background:white;
+
+    color:#2563EB;
+
+    box-shadow:0 0 40px rgba(255,255,255,.4);
+
+    animation:float 2s infinite ease-in-out;
+
+}
+
+.logo h1{
+
+    margin-top:20px;
+
+    font-size:40px;
+
+    letter-spacing:1px;
+
+}
+
+.logo p{
+
+    margin-top:8px;
+
+    color:#dbeafe;
+
+}
+
+/*========================
+SPINNER
+=========================*/
+
+.loader{
+
+    margin:40px auto;
+
+    width:70px;
+    height:70px;
+
+    border-radius:50%;
+
+    border:6px solid rgba(255,255,255,.2);
+
+    border-top:6px solid white;
+
+    animation:spin 1s linear infinite;
+
+}
+
+.loading-text{
+
+    margin-top:10px;
+
+    color:#dbeafe;
+
+}
+
+/*========================
+ANIMATION
+=========================*/
+
+@keyframes spin{
+
+    100%{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+@keyframes float{
+
+    0%{
+
+        transform:translateY(0);
+
+    }
+
+    50%{
+
+        transform:translateY(-10px);
+
+    }
+
+    100%{
+
+        transform:translateY(0);
+
+    }
+
+}

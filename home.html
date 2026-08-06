@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+
+    <script>
+        (function () {
+            var saved = localStorage.getItem("drwallet_theme");
+            var theme = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Wallet | Student Expense Tracker</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS (order matters: tokens -> shared components -> page -> responsive) -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+</head>
+<body>
+
+    <!-- =========================
+            NAVBAR
+    ========================== -->
+
+    <header class="site-header">
+
+        <nav class="navbar">
+
+            <a href="home.html" class="logo">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Dr. Wallet</span>
+            </a>
+
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">
+                <span></span><span></span><span></span>
+            </label>
+
+            <ul class="nav-links">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#tracker">Tracker</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li id="navDashboardLink" style="display:none"><a href="dashboard.html">Dashboard</a></li>
+                <li class="mobile-auth-slot">
+                    <div id="authSlotMobile"></div>
+                </li>
+            </ul>
+
+            <div class="nav-buttons">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <i class="fa-solid fa-sun"></i>
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <div id="authSlot">
+                    <a href="signin.html" class="btn btn-ghost">Sign In</a>
+                    <a href="signup.html" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+
+        </nav>
+
+    </header>
+
+    <main>
+
+        <!-- =========================
+                HERO
+        ========================== -->
+
+        <section class="hero" id="home">
+
+            <div class="hero-left">
+
+                <p class="tag"><i class="fa-solid fa-circle"></i> Built for student life, not corporate budgets</p>
+
+                <h1>Know where every <em>rupee</em> goes.</h1>
+
+                <p class="hero-description">
+                    Mess fees, hostel rent, canteen runs, textbooks, the odd fest splurge —
+                    Dr. Wallet keeps your student budget honest, so month-end
+                    never catches you off guard.
+                </p>
+
+                <div class="hero-buttons">
+                    <a href="signup.html" class="btn btn-primary js-signup-cta">Get Started Free</a>
+                    <a href="#tracker" class="link-inline">
+                        See how it works <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="hero-tags">
+                    <span>🍽️ Mess &amp; Canteen</span>
+                    <span>🏠 Hostel Rent</span>
+                    <span>🚌 Transit</span>
+                    <span>📚 Books</span>
+                    <span>🎉 Fest Fund</span>
+                </div>
+
+            </div>
+
+            <div class="hero-right" aria-hidden="true">
+
+                <div class="wallet-card">
+
+                    <div class="wallet-card-top">
+                        <span>Monthly Budget</span>
+                        <span class="wallet-pill">March</span>
+                    </div>
+
+                    <div class="wallet-balance">
+                        <span class="currency">₹</span><span class="amount">8,240</span>
+                        <span class="of">spent of ₹12,000</span>
+                    </div>
+
+                    <div class="wallet-progress">
+                        <div class="wallet-progress-fill"></div>
+                    </div>
+
+                    <div class="wallet-categories">
+                        <div class="cat-chip">
+                            <i class="fa-solid fa-utensils"></i>
+                            <span>Food &amp; Mess</span>
+                            <b>₹2,150</b>
+                        </div>
+                        <div class="cat-chip">
+                            <i class="fa-solid fa-bus"></i>
+                            <span>Transit</span>
+                            <b>₹640</b>
+                        </div>
+                        <div class="cat-chip">
+                            <i class="fa-solid fa-book"></i>
+                            <span>Books</span>
+                            <b>₹1,850</b>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mini-chart-card">
+                    <span class="mini-chart-title">Last 7 days</span>
+                    <div class="mini-chart">
+                        <span style="--h:40%"></span>
+                        <span style="--h:65%"></span>
+                        <span style="--h:30%"></span>
+                        <span style="--h:80%"></span>
+                        <span style="--h:55%"></span>
+                        <span style="--h:70%"></span>
+                        <span style="--h:90%"></span>
+                    </div>
+                </div>
+
+                <div class="streak-badge">
+                    <i class="fa-solid fa-fire"></i>
+                    <div>
+                        <b>12-day streak</b>
+                        <span>logging expenses daily</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =========================
+                ABOUT
+        ========================== -->
+
+        <section class="about" id="about">
+
+            <div class="container">
+
+                <div class="about-visual">
+
+                    <div class="donut-card">
+
+                        <h4>Where a typical student's month goes</h4>
+
+                        <div class="donut-wrap">
+                            <div class="donut-center">
+                                <b>₹12,000</b>
+                                <span>this month</span>
+                            </div>
+                        </div>
+
+                        <ul class="donut-legend">
+                            <li><i class="dot-hostel"></i> Hostel — 38%</li>
+                            <li><i class="dot-food"></i> Food — 20%</li>
+                            <li><i class="dot-transit"></i> Transit — 22%</li>
+                            <li><i class="dot-other"></i> Other — 20%</li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                <div class="about-content">
+
+                    <span class="eyebrow">ABOUT DR. WALLET</span>
+
+                    <h2>Made for students, not corporate expense reports.</h2>
+
+                    <p>
+                        Most expense apps are built for salaries, invoices and tax season.
+                        Dr. Wallet is built around allowance days, split hostel bills and the
+                        last week of the month when the wallet always runs thin.
+                    </p>
+
+                    <p>
+                        Log a spend in seconds, set a monthly budget that resets automatically,
+                        and see exactly which habit is quietly draining your balance —
+                        all from one clean dashboard.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =========================
+                FEATURES
+        ========================== -->
+
+        <section class="features" id="features">
+
+            <div class="section-head">
+                <span class="eyebrow">FEATURES</span>
+                <h2>Everything a student budget actually needs</h2>
+            </div>
+
+            <div class="features-grid">
+
+                <article class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <h3>Log a Spend in Seconds</h3>
+                    <p>Add an expense with an amount, a category and a note — no forms, no friction, built for between-class moments.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-bullseye"></i></div>
+                    <h3>Monthly Budget Goals</h3>
+                    <p>Set a limit per category — mess, transit, fun money — and watch the progress bar so you know before you overspend, not after.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                    <h3>Visual Spending Reports</h3>
+                    <p>A weekly breakdown that shows exactly where your allowance disappeared, without digging through a bank statement.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <h3>Overspend Alerts</h3>
+                    <p>Get nudged the moment a category creeps past 80% of budget, so the last week of the month stops being a surprise.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-fire"></i></div>
+                    <h3>Logging Streaks</h3>
+                    <p>A small daily habit — logging streaks keep you honest about tracking, the same way they keep you honest about spending.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+                    <h3>Savings Goals</h3>
+                    <p>Set aside money for a trip, a gadget or an emergency fund, and track it right alongside your everyday spending.</p>
+                </article>
+
+            </div>
+
+        </section>
+
+        <!-- =========================
+                TRACKER PREVIEW
+        ========================== -->
+
+        <section class="tracker" id="tracker">
+
+            <div class="container">
+
+                <div class="tracker-content">
+
+                    <span class="eyebrow">THE TRACKER</span>
+
+                    <h2>A ledger that actually reads like your life</h2>
+
+                    <p>
+                        Every entry lands in a clean, chronological ledger —
+                        so "where did my money go" is answered in one glance,
+                        not one spreadsheet.
+                    </p>
+
+                    <ul class="tracker-points">
+                        <li><i class="fa-solid fa-check"></i> Categorised automatically as food, transit, books, hostel &amp; more</li>
+                        <li><i class="fa-solid fa-check"></i> Color-coded so overspending is obvious at a glance</li>
+                        <li><i class="fa-solid fa-check"></i> Synced to your monthly budget in real time</li>
+                    </ul>
+
+                    <a href="signup.html" class="btn btn-primary js-signup-cta">Start Tracking Free</a>
+
+                </div>
+
+                <div class="ledger-card">
+
+                    <div class="ledger-head">
+                        <h4>Recent Activity</h4>
+                        <span>Today</span>
+                    </div>
+
+                    <div class="ledger-row">
+                        <div class="ledger-icon icon-food"><i class="fa-solid fa-utensils"></i></div>
+                        <div class="ledger-info">
+                            <b>Canteen lunch</b>
+                            <span>Food &amp; Mess · 1:20 PM</span>
+                        </div>
+                        <div class="ledger-amount">− ₹120</div>
+                    </div>
+
+                    <div class="ledger-row">
+                        <div class="ledger-icon icon-transit"><i class="fa-solid fa-bus"></i></div>
+                        <div class="ledger-info">
+                            <b>Bus pass top-up</b>
+                            <span>Transit · 9:05 AM</span>
+                        </div>
+                        <div class="ledger-amount">− ₹300</div>
+                    </div>
+
+                    <div class="ledger-row">
+                        <div class="ledger-icon icon-books"><i class="fa-solid fa-book"></i></div>
+                        <div class="ledger-info">
+                            <b>Semester textbook</b>
+                            <span>Books · Yesterday</span>
+                        </div>
+                        <div class="ledger-amount">− ₹850</div>
+                    </div>
+
+                    <div class="ledger-row">
+                        <div class="ledger-icon icon-hostel"><i class="fa-solid fa-wallet"></i></div>
+                        <div class="ledger-info">
+                            <b>Monthly allowance</b>
+                            <span>Income · Yesterday</span>
+                        </div>
+                        <div class="ledger-amount in">+ ₹5,000</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =========================
+                CTA
+        ========================== -->
+
+        <section class="cta">
+
+            <div class="cta-text">
+                <h2>Your allowance deserves a plan.</h2>
+                <p>Free to use. Built for students. Set up in under two minutes.</p>
+            </div>
+
+            <a href="signup.html" class="btn js-signup-cta">Create Free Account</a>
+
+        </section>
+
+    </main>
+
+    <!-- =========================
+            FOOTER
+    ========================== -->
+
+    <footer class="site-footer">
+
+        <div class="footer-top">
+
+            <div class="footer-brand">
+                <a href="home.html" class="logo">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Dr. Wallet</span>
+                </a>
+                <p>A simple, student-first expense tracker built to make budgeting one less thing to stress about.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#tracker">Tracker</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="signup.html" class="js-signup-cta">Sign Up</a></li>
+                    <li><a href="signin.html">Sign In</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Dr. Wallet. Built as a student project.</span>
+            <span>Made with <i class="fa-solid fa-heart" style="color:#EF4444"></i> for students who overspend on chai.</span>
+        </div>
+
+    </footer>
+
+    <div id="toast-container"></div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/auth.js"></script>
+
+</body>
+</html>

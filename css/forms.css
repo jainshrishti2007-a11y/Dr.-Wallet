@@ -1,0 +1,135 @@
+/*==========================================
+  AUTH PAGE WRAPPER
+==========================================*/
+
+.auth-wrap{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:150px 6% 80px;
+    background-color:var(--color-bg);
+    background-image:radial-gradient(circle, rgba(37,99,235,.10) 1.5px, transparent 1.5px);
+    background-size:26px 26px;
+    position:relative;
+    overflow:hidden;
+}
+
+.auth-wrap::before{
+    content:"";
+    position:absolute;
+    width:600px;
+    height:600px;
+    background:#2563EB14;
+    border-radius:50%;
+    top:-240px;
+    right:-180px;
+    filter:blur(90px);
+}
+
+.auth-card{
+    position:relative;
+    z-index:2;
+    width:100%;
+    background:var(--color-surface);
+    border:1px solid var(--color-border);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-lg);
+    padding:44px 48px;
+}
+
+.auth-head{
+    text-align:center;
+    margin-bottom:36px;
+}
+
+.auth-head .logo{
+    justify-content:center;
+    margin-bottom:18px;
+    font-size:24px;
+}
+
+.auth-head h1{
+    font-family:var(--font-display);
+    font-size:28px;
+    color:var(--color-ink);
+    margin-bottom:8px;
+}
+
+.auth-head p{
+    color:var(--color-slate);
+    font-size:14.5px;
+}
+
+/*==========================================
+  FORM ELEMENTS
+==========================================*/
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px 22px;
+}
+
+.form-grid .full{
+    grid-column:1 / -1;
+}
+
+.form-grid .form-group{
+    margin-bottom:0;
+}
+
+.section-divider{
+    grid-column:1 / -1;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin:6px 0 4px;
+    color:var(--color-slate-light);
+    font-size:12.5px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.section-divider::before,
+.section-divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--color-border);
+}
+
+.auth-submit{
+    width:100%;
+    padding:16px;
+    font-size:15.5px;
+    margin-top:8px;
+}
+
+.auth-switch{
+    text-align:center;
+    margin-top:26px;
+    font-size:14px;
+    color:var(--color-slate);
+}
+
+.auth-switch a{
+    color:var(--color-primary);
+    font-weight:600;
+}
+
+.auth-switch a:hover{
+    text-decoration:underline;
+}
+
+@media(max-width:640px){
+
+    .auth-card{
+        padding:34px 26px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+}
