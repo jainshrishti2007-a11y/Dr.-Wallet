@@ -5,34 +5,34 @@
 
 :root{
 
-    /* ---- surfaces ---- */
-    --color-bg:#F7FAFC;
+    /* ---- surfaces (warm, slightly violet-tinted, not cold blue-gray) ---- */
+    --color-bg:#FAF9FC;
     --color-surface:#FFFFFF;
-    --color-surface-alt:#F8FAFC;
-    --color-border:#E2E8F0;
+    --color-surface-alt:#F4F1FB;
+    --color-border:#E5E0F2;
 
-    /* ---- brand ---- */
-    --color-primary:#2563EB;
-    --color-primary-dark:#1D4ED8;
-    --color-primary-light:#3B82F6;
-    --color-primary-tint:#DBEAFE;
+    /* ---- brand: indigo/violet instead of generic SaaS blue ---- */
+    --color-primary:#6D5EF5;
+    --color-primary-dark:#5642E0;
+    --color-primary-light:#8B7CF6;
+    --color-primary-tint:#ECE8FE;
 
-    /* ---- money semantics: green = saved, amber = warning, red = overspent ---- */
-    --color-accent:#10B981;
-    --color-accent-tint:#D1FAE5;
-    --color-warning:#F59E0B;
+    /* ---- money semantics: teal = saved, amber = warning, rose = overspent ---- */
+    --color-accent:#0D9488;
+    --color-accent-tint:#CCFBF1;
+    --color-warning:#D97706;
     --color-warning-tint:#FEF3C7;
-    --color-danger:#EF4444;
-    --color-danger-tint:#FEE2E2;
+    --color-danger:#E11D48;
+    --color-danger-tint:#FFE4E6;
 
-    /* ---- ink ---- */
-    --color-ink:#0F172A;
-    --color-slate:#64748B;
-    --color-slate-light:#94A3B8;
+    /* ---- ink (warm near-black, not cold slate) ---- */
+    --color-ink:#1B1626;
+    --color-slate:#6B6280;
+    --color-slate-light:#9B90B0;
 
     /* ---- type ---- */
-    --font-display:'Sora', sans-serif;
-    --font-body:'Poppins', sans-serif;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
     --font-mono:'JetBrains Mono', monospace;
 
     /* ---- shape ---- */
@@ -42,9 +42,9 @@
     --radius-pill:999px;
 
     /* ---- elevation ---- */
-    --shadow-sm:0 8px 20px rgba(15,23,42,.06);
-    --shadow-md:0 20px 40px rgba(15,23,42,.08);
-    --shadow-lg:0 30px 60px rgba(15,23,42,.14);
+    --shadow-sm:0 8px 20px rgba(27,22,38,.06);
+    --shadow-md:0 20px 40px rgba(27,22,38,.08);
+    --shadow-lg:0 30px 60px rgba(27,22,38,.14);
 
     /* ---- glass surfaces (navbar, flip-card) — swap for dark translucency in dark mode ---- */
     --glass-navbar-bg:rgba(255,255,255,.7);
@@ -58,7 +58,7 @@
     --glass-flip-btn-bg:rgba(255,255,255,.7);
 
     /* ---- fixed-dark surfaces (footer, badges) — always dark, never flips with theme ---- */
-    --color-fixed-dark:#0F172A;
+    --color-fixed-dark:#150F22;
 
     /* ---- layout ---- */
     --container:1280px;
@@ -72,36 +72,36 @@
 
 :root[data-theme="dark"]{
 
-    --color-bg:#0B1120;
-    --color-surface:#131C2E;
-    --color-surface-alt:#1A2540;
-    --color-border:#2A3655;
+    --color-bg:#0F0A1A;
+    --color-surface:#181025;
+    --color-surface-alt:#211732;
+    --color-border:#352A4A;
 
-    --color-primary:#3B82F6;
-    --color-primary-dark:#2563EB;
-    --color-primary-light:#60A5FA;
-    --color-primary-tint:rgba(59,130,246,.18);
+    --color-primary:#9083FF;
+    --color-primary-dark:#6D5EF5;
+    --color-primary-light:#AFA4FF;
+    --color-primary-tint:rgba(144,131,255,.18);
 
-    --color-accent:#34D399;
-    --color-accent-tint:rgba(16,185,129,.18);
+    --color-accent:#2DD4BF;
+    --color-accent-tint:rgba(45,212,191,.18);
     --color-warning:#FBBF24;
     --color-warning-tint:rgba(245,158,11,.18);
-    --color-danger:#F87171;
-    --color-danger-tint:rgba(239,68,68,.18);
+    --color-danger:#FB7185;
+    --color-danger-tint:rgba(244,63,94,.18);
 
-    --color-ink:#F1F5F9;
-    --color-slate:#94A3B8;
-    --color-slate-light:#64748B;
+    --color-ink:#F3EFFA;
+    --color-slate:#AB9FC7;
+    --color-slate-light:#6F6485;
 
     --shadow-sm:0 8px 20px rgba(0,0,0,.35);
     --shadow-md:0 20px 40px rgba(0,0,0,.4);
     --shadow-lg:0 30px 60px rgba(0,0,0,.5);
 
-    --glass-navbar-bg:rgba(19,28,46,.75);
+    --glass-navbar-bg:rgba(24,16,37,.75);
     --glass-navbar-border:rgba(255,255,255,.08);
-    --glass-mobile-menu-bg:rgba(19,28,46,.97);
-    --glass-card-start:rgba(30,41,59,.78);
-    --glass-card-end:rgba(17,24,39,.5);
+    --glass-mobile-menu-bg:rgba(24,16,37,.97);
+    --glass-card-start:rgba(33,23,50,.78);
+    --glass-card-end:rgba(15,10,26,.5);
     --glass-card-border:rgba(255,255,255,.08);
     --glass-card-shine:rgba(255,255,255,.05);
     --glass-card-inset:rgba(255,255,255,.05);

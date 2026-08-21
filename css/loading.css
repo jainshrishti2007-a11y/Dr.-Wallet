@@ -1,149 +1,188 @@
-/*========================
-GLOBAL
-=========================*/
+/*==========================================
+  DR. WALLET — LOADING SCREEN
+==========================================*/
 
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
+}
+
+html, body{
+    height:100%;
 }
 
 body{
-
+    font-family:'Inter', sans-serif;
     display:flex;
     justify-content:center;
     align-items:center;
-
     width:100%;
     height:100vh;
-
-    background:linear-gradient(135deg,#2563EB,#1E3A8A);
-
     overflow:hidden;
-
+    background:
+        radial-gradient(circle at 20% 15%, rgba(255,255,255,.10), transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(255,255,255,.08), transparent 40%),
+        linear-gradient(135deg, #7C6BFF 0%, #6D5EF5 35%, #3A2E8F 75%, #1B1440 100%);
 }
 
-/*========================
-MAIN CONTAINER
-=========================*/
+/*==========================================
+  MAIN CONTAINER (fades out before handoff to home.html)
+==========================================*/
 
 .loader-container{
-
-    text-align:center;
-
-    color:white;
-
-}
-
-/*========================
-LOGO
-=========================*/
-
-.wallet{
-
-    width:120px;
-    height:120px;
-
-    margin:auto;
-
-    border-radius:50%;
-
+    width:100%;
+    max-width:480px;
+    padding:0 32px;
     display:flex;
-    justify-content:center;
+    flex-direction:column;
     align-items:center;
-
-    font-size:55px;
-
-    background:white;
-
-    color:#2563EB;
-
-    box-shadow:0 0 40px rgba(255,255,255,.4);
-
-    animation:float 2s infinite ease-in-out;
-
+    text-align:center;
+    color:#fff;
+    opacity:1;
+    transition:opacity 550ms ease;
 }
 
-.logo h1{
-
-    margin-top:20px;
-
-    font-size:40px;
-
-    letter-spacing:1px;
-
+.loader-container.fade-out{
+    opacity:0;
 }
 
-.logo p{
+/*==========================================
+  BRAND ROW (small — the percentage is the star now)
+==========================================*/
 
+.load-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:19px;
+    letter-spacing:.3px;
+    opacity:.9;
+    margin-bottom:8px;
+}
+
+.load-brand i{
+    font-size:17px;
+    color:#fff;
+    background:rgba(255,255,255,.16);
+    width:32px;
+    height:32px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/*==========================================
+  PERCENTAGE COUNTER
+  Claims roughly 40% of the viewport height on its own.
+==========================================*/
+
+.load-percent-zone{
+    min-height:38vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.load-percent{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:clamp(88px, 19vw, 176px);
+    line-height:1;
+    letter-spacing:-2px;
+    background:linear-gradient(135deg, #FFFFFF 0%, #E4DFFF 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+
+/*==========================================
+  PROGRESS BAR
+==========================================*/
+
+.load-bar-track{
+    width:100%;
+    max-width:340px;
+    height:10px;
+    border-radius:999px;
+    background:rgba(255,255,255,.18);
+    overflow:hidden;
     margin-top:8px;
-
-    color:#dbeafe;
-
 }
 
-/*========================
-SPINNER
-=========================*/
-
-.loader{
-
-    margin:40px auto;
-
-    width:70px;
-    height:70px;
-
-    border-radius:50%;
-
-    border:6px solid rgba(255,255,255,.2);
-
-    border-top:6px solid white;
-
-    animation:spin 1s linear infinite;
-
+.load-bar-fill{
+    height:100%;
+    width:0%;
+    border-radius:999px;
+    background:linear-gradient(90deg, #C9BFFF, #FFFFFF);
+    box-shadow:0 0 16px rgba(255,255,255,.5);
+    transition:width .15s linear;
 }
 
-.loading-text{
+/*==========================================
+  STATUS / WELCOME MESSAGE
+  Both sit in the same slot so the crossfade doesn't
+  cause a layout jump.
+==========================================*/
 
-    margin-top:10px;
-
-    color:#dbeafe;
-
+.load-message-zone{
+    position:relative;
+    height:26px;
+    margin-top:22px;
+    width:100%;
 }
 
-/*========================
-ANIMATION
-=========================*/
-
-@keyframes spin{
-
-    100%{
-
-        transform:rotate(360deg);
-
-    }
-
+.load-status,
+.load-welcome{
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    font-size:14.5px;
+    font-weight:500;
+    color:#E4DFFF;
+    transition:opacity .4s ease, transform .4s ease;
 }
 
-@keyframes float{
+.load-status{
+    opacity:.85;
+    transform:translateY(0);
+}
 
-    0%{
+.load-status.hide{
+    opacity:0;
+    transform:translateY(-6px);
+}
 
-        transform:translateY(0);
+.load-welcome{
+    opacity:0;
+    transform:translateY(6px);
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:16px;
+    color:#fff;
+}
 
+.load-welcome.show{
+    opacity:1;
+    transform:translateY(0);
+}
+
+/*==========================================
+  RESPONSIVE
+==========================================*/
+
+@media(max-width:480px){
+
+    .load-percent-zone{
+        min-height:32vh;
     }
 
-    50%{
-
-        transform:translateY(-10px);
-
+    .load-brand{
+        font-size:16px;
     }
-
-    100%{
-
-        transform:translateY(0);
-
-    }
-
 }

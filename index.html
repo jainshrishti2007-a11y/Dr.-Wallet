@@ -7,11 +7,14 @@
 
     <title>Dr. Wallet</title>
 
-    <!-- Auto-redirect to the home page after 5 seconds -->
-    <meta http-equiv="refresh" content="5;url=home.html">
+    <!-- No meta-refresh here anymore — js/loading.js drives the timing
+         and does a smooth fade into home.html instead of a hard jump. -->
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <!-- CSS -->
     <link rel="stylesheet" href="css/loading.css">
@@ -19,19 +22,29 @@
 </head>
 <body>
 
-    <main class="loader-container">
+    <main class="loader-container" id="loaderContainer">
 
-        <div class="logo">
-            <div class="wallet">💳</div>
-            <h1>Dr. Wallet</h1>
-            <p>Smart Student Expense Tracker</p>
+        <div class="load-brand">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Dr. Wallet</span>
         </div>
 
-        <div class="loader" role="status" aria-label="Loading"></div>
+        <div class="load-percent-zone">
+            <span class="load-percent" id="loadPercent">0%</span>
+        </div>
 
-        <p class="loading-text">Preparing your dashboard…</p>
+        <div class="load-bar-track">
+            <div class="load-bar-fill" id="loadBarFill"></div>
+        </div>
+
+        <div class="load-message-zone">
+            <p class="load-status" id="loadStatus">Setting things up&hellip;</p>
+            <p class="load-welcome" id="loadWelcome">Welcome to Dr. Wallet!</p>
+        </div>
 
     </main>
+
+    <script src="js/loading.js"></script>
 
 </body>
 </html>
