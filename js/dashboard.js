@@ -23,20 +23,40 @@ function saveDashData(data) {
 /* ---------- smart category detection ---------- */
 
 const CATEGORY_MAP = [
-    { name: "Food & Mess", emoji: "🍽️", keywords: ["food", "mess", "meal", "lunch", "dinner", "breakfast", "thali", "dhaba", "canteen", "tiffin"] },
-    { name: "Coffee & Tea", emoji: "☕", keywords: ["coffee", "chai", "tea", "latte", "cappuccino"] },
-    { name: "Snacks", emoji: "🍟", keywords: ["snack", "chips", "maggi", "samosa", "momo", "momos", "burger", "pizza", "fries", "sandwich", "icecream"] },
-    { name: "Drinks", emoji: "🥤", keywords: ["juice", "cold drink", "coke", "pepsi", "soda", "drink", "shake"] },
-    { name: "Transport", emoji: "🚌", keywords: ["bus", "auto", "cab", "uber", "ola", "metro", "train", "fuel", "petrol", "rickshaw", "rapido"] },
-    { name: "Books & Stationery", emoji: "📚", keywords: ["book", "notebook", "pen", "pencil", "stationery", "xerox", "print", "photocopy", "assignment"] },
-    { name: "Hostel & Rent", emoji: "🏠", keywords: ["rent", "hostel", "room", "pg", "maintenance"] },
-    { name: "Entertainment", emoji: "🎬", keywords: ["movie", "netflix", "spotify", "game", "party", "fest", "concert", "outing"] },
-    { name: "Shopping", emoji: "🛍️", keywords: ["shopping", "clothes", "shoes", "dress", "amazon", "flipkart", "tshirt"] },
-    { name: "Health", emoji: "💊", keywords: ["medicine", "doctor", "hospital", "gym", "health", "pharmacy"] },
-    { name: "Recharge & Bills", emoji: "📱", keywords: ["recharge", "mobile", "wifi", "subscription", "sim", "bill"] },
+    { name: "Food & Mess", icon: "fa-utensils", color: "#E6B85C", keywords: ["food", "mess", "meal", "lunch", "dinner", "breakfast", "thali", "dhaba", "canteen", "tiffin"] },
+
+    { name: "Coffee & Tea", icon: "fa-mug-hot", color: "#D89B72", keywords: ["coffee", "chai", "tea", "latte", "cappuccino"] },
+
+    { name: "Snacks", icon: "fa-burger", color: "#F08A5D", keywords: ["snack", "chips", "maggi", "samosa", "momo", "momos", "burger", "pizza", "fries", "sandwich", "icecream"] },
+
+    { name: "Drinks", icon: "fa-bottle-water", color: "#63B7A4", keywords: ["juice", "cold drink", "coke", "pepsi", "soda", "drink", "shake"] },
+
+    { name: "Transport", icon: "fa-bus", color: "#f0ed6b", keywords: ["bus", "auto", "cab", "uber", "ola", "metro", "train", "fuel", "petrol", "rickshaw", "rapido"] },
+
+    { name: "Books & Stationery", icon: "fa-book", color: "#B79AD6", keywords: ["book", "notebook", "pen", "pencil", "stationery", "xerox", "print", "photocopy", "assignment"] },
+
+    { name: "Hostel & Rent", icon: "fa-house", color: "#75C49A", keywords: ["rent", "hostel", "room", "pg", "maintenance"] },
+
+    { name: "Entertainment", icon: "fa-film", color: "#D9829A", keywords: ["movie", "netflix", "spotify", "game", "party", "fest", "concert", "outing"] },
+
+    { name: "Shopping", icon: "fa-bag-shopping", color: "#E27C73", keywords: ["shopping", "clothes", "shoes", "dress", "amazon", "flipkart", "tshirt"] },
+
+    { name: "Health", icon: "fa-heart-pulse", color: "#E57373", keywords: ["medicine", "doctor", "hospital", "gym", "health", "pharmacy"] },
+
+    { name: "Recharge & Bills", icon: "fa-mobile-screen", color: "#67B58A", keywords: ["recharge", "mobile", "wifi", "subscription", "sim", "bill"] },
 ];
 
-const DEFAULT_CATEGORY = { name: "Other", emoji: "💰" };
+const DEFAULT_CATEGORY = { name: "Other", icon: "fa-tag", color: "#8A8078" };
+
+/* Look up a category's icon + colour by name — used when rendering
+   older saved records that don't carry their own icon/colour. */
+const CATEGORY_STYLE = Object.fromEntries(
+    [...CATEGORY_MAP, DEFAULT_CATEGORY].map((c) => [c.name, { icon: c.icon, color: c.color }])
+);
+
+function styleForCategory(name) {
+    return CATEGORY_STYLE[name] || DEFAULT_CATEGORY;
+}
 
 function detectCategory(text) {
     const lower = text.toLowerCase().trim();
@@ -105,7 +125,8 @@ function addExpense(itemRaw, amount) {
         item: itemRaw.trim(),
         amount: Number(amount),
         category: cat.name,
-        emoji: cat.emoji,
+        icon: cat.icon,
+        color: cat.color,
         date: new Date().toISOString(),
         canonicalKey,
     };
@@ -114,7 +135,7 @@ function addExpense(itemRaw, amount) {
     saveDashData(data);
     renderAll();
 
-    showToast(`${cat.emoji} Added "${expense.item}" — ₹${expense.amount}`, "success");
+    showToast(`Added "${expense.item}" — ₹${expense.amount}`, "success");
 }
 
 function deleteExpense(id) {
@@ -157,8 +178,6 @@ function computeWeeklySeries(expenses) {
     });
 }
 
-const CATEGORY_COLORS = ["#2563EB", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#14B8A6", "#EC4899", "#64748B"];
-
 function computeCategoryBreakdown(expenses) {
     const monthExpenses = getMonthExpenses(expenses);
     const map = {};
@@ -178,10 +197,10 @@ function computeCategoryBreakdown(expenses) {
 
     const totalAll = arr.reduce((s, c) => s + c.total, 0);
 
-    return arr.map((c, i) => ({
+    return arr.map((c) => ({
         ...c,
         pct: totalAll ? (c.total / totalAll) * 100 : 0,
-        color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
+        color: styleForCategory(c.name).color,
     }));
 }
 
@@ -197,10 +216,12 @@ function getHotItems(expenses) {
         .filter((g) => g.length >= 3)
         .map((g) => {
             const latest = g[0]; // expenses are stored newest-first
+            const style = styleForCategory(latest.category);
             return {
                 canonicalKey: latest.canonicalKey,
                 item: latest.item,
-                emoji: latest.emoji,
+                icon: latest.icon || style.icon,
+                color: latest.color || style.color,
                 category: latest.category,
                 lastAmount: latest.amount,
                 count: g.length,
@@ -214,7 +235,7 @@ function getHotItems(expenses) {
 function renderGreeting() {
     const session = getSession();
     const firstName = session ? session.name.split(" ")[0] : "there";
-    document.getElementById("dashGreeting").textContent = `Hey ${firstName} 👋`;
+    document.getElementById("dashGreeting").textContent = `Hey, ${firstName}`;
     document.getElementById("dashDate").textContent =
         `Here's where your money went — ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}`;
 }
@@ -383,19 +404,19 @@ function renderWeeklyChart() {
     const areaPath = `${linePath} L${points[points.length - 1].x},${baseY} L${points[0].x},${baseY} Z`;
 
     const circles = points
-        .map((p) => `<circle cx="${p.x}" cy="${p.y.toFixed(1)}" r="5" fill="#2563EB" stroke="#fff" stroke-width="2"><title>${p.label}: ₹${p.total}</title></circle>`)
+        .map((p) => `<circle cx="${p.x}" cy="${p.y.toFixed(1)}" r="5" fill="var(--color-primary)" stroke="var(--color-surface)" stroke-width="2.5"><title>${p.label}: ₹${p.total}</title></circle>`)
         .join("");
 
     wrap.innerHTML = `
         <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
             <defs>
                 <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#2563EB" stop-opacity="0.35"/>
-                    <stop offset="100%" stop-color="#2563EB" stop-opacity="0"/>
+                    <stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.28"/>
+                    <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0"/>
                 </linearGradient>
             </defs>
             <path d="${areaPath}" fill="url(#areaGrad)"/>
-            <path d="${linePath}" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="${linePath}" fill="none" stroke="var(--color-primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
             ${circles}
         </svg>
         <div class="chart-day-labels">
@@ -468,7 +489,9 @@ function renderHotTopics() {
                 .map(
                     (h) => `
                 <div class="hot-chip" data-canonical="${h.canonicalKey}">
-                    <span class="hot-emoji">${h.emoji}</span>
+                    <span class="hot-icon" style="color:${h.color};background:${h.color}22">
+                        <i class="fa-solid ${h.icon}"></i>
+                    </span>
                     <div class="hot-info">
                         <span class="hot-name">${h.item}</span>
                         <span class="hot-price">₹${h.lastAmount} · ${h.count}×</span>
@@ -511,17 +534,22 @@ function renderLedger() {
         list.innerHTML = `
             <div class="ledger-empty">
                 <i class="fa-solid fa-receipt"></i>
-                No expenses yet. Add your first one above 👆
+                No expenses yet — add your first one above.
             </div>
         `;
         return;
     }
 
     list.innerHTML = monthExpenses
-        .map(
-            (e) => `
+        .map((e) => {
+            const st = styleForCategory(e.category);
+            const icon = e.icon || st.icon;
+            const color = e.color || st.color;
+            return `
         <div class="ledger-item-row">
-            <div class="ledger-item-emoji">${e.emoji}</div>
+            <div class="ledger-item-icon" style="color:${color};background:${color}1E">
+                <i class="fa-solid ${icon}"></i>
+            </div>
             <div class="ledger-item-info">
                 <b>${e.item}</b>
                 <div class="ledger-item-meta">
@@ -534,8 +562,8 @@ function renderLedger() {
                 <i class="fa-solid fa-trash"></i>
             </button>
         </div>
-    `
-        )
+    `;
+        })
         .join("");
 
     list.querySelectorAll(".ledger-delete-btn").forEach((btn) => {
@@ -629,7 +657,8 @@ function initQuickAddForm() {
             return;
         }
         const cat = detectCategory(val);
-        preview.textContent = cat.emoji;
+        preview.innerHTML = `<i class="fa-solid ${cat.icon}"></i>`;
+        preview.style.color = cat.color;
         categoryTag.textContent = cat.name;
         preview.classList.add("show");
         categoryTag.classList.add("show");

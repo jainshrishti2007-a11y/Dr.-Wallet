@@ -46,11 +46,16 @@
 }
 
 .nav-links a{
-    color:#334155;
+    color:var(--color-slate);
     font-weight:500;
     font-size:15px;
     position:relative;
-    transition:.3s;
+    transition:color .3s, transform .2s, filter .2s;
+}
+
+.nav-links a.active{
+    color:var(--color-ink);
+    font-weight:600;
 }
 
 .nav-links a::after{
