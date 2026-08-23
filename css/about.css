@@ -253,74 +253,7 @@
     line-height:1.7;
 }
 
-/*==========================================
-  CREATOR NOTE
-==========================================*/
 
-.creator{
-    padding:100px 8%;
-    background:var(--color-bg);
-}
-
-.creator-card{
-    max-width:760px;
-    margin:0 auto;
-    background:var(--color-surface);
-    border:1px solid var(--color-border);
-    border-radius:var(--radius-lg);
-    padding:48px 52px;
-    box-shadow:var(--shadow-sm);
-    text-align:center;
-}
-
-.creator-card i.fa-quote-left{
-    font-size:26px;
-    color:var(--color-primary-tint);
-    margin-bottom:18px;
-}
-
-.creator-card blockquote{
-    font-family:var(--font-display);
-    font-size:22px;
-    line-height:1.5;
-    color:var(--color-ink);
-    margin-bottom:28px;
-}
-
-.creator-identity{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:14px;
-}
-
-.creator-avatar{
-    width:52px;
-    height:52px;
-    border-radius:50%;
-    background:linear-gradient(135deg,var(--color-primary),var(--color-primary-dark));
-    color:#fff;
-    font-family:var(--font-display);
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.creator-identity div{
-    text-align:left;
-}
-
-.creator-identity b{
-    display:block;
-    font-size:15px;
-    color:var(--color-ink);
-}
-
-.creator-identity span{
-    font-size:13px;
-    color:var(--color-slate);
-}
 
 /*==========================================
   RESPONSIVE
