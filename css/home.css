@@ -19,7 +19,7 @@
     overflow:hidden;
     background-color:var(--color-bg);
     background-image:
-        radial-gradient(circle, rgba(37,99,235,.10) 1.5px, transparent 1.5px);
+        radial-gradient(circle, var(--color-pattern) 1.5px, transparent 1.5px);
     background-size:26px 26px;
 }
 
@@ -28,7 +28,7 @@
     position:absolute;
     width:700px;
     height:700px;
-    background:#2563EB14;
+    background:var(--color-glow-primary);
     border-radius:50%;
     top:-260px;
     right:-200px;
@@ -40,7 +40,7 @@
     position:absolute;
     width:500px;
     height:500px;
-    background:#10B98112;
+    background:var(--color-glow-accent);
     border-radius:50%;
     bottom:-220px;
     left:-160px;

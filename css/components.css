@@ -478,6 +478,10 @@
     overflow:hidden;
 }
 
+:root[data-theme="dark"] .cta{
+    background:linear-gradient(120deg,#655BC3,#45436F);
+}
+
 .cta::before{
     content:"";
     position:absolute;

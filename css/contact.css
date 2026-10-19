@@ -8,7 +8,7 @@
     padding:170px 8% 80px;
     text-align:center;
     background-color:var(--color-bg);
-    background-image:radial-gradient(circle, rgba(37,99,235,.10) 1.5px, transparent 1.5px);
+    background-image:radial-gradient(circle, var(--color-pattern) 1.5px, transparent 1.5px);
     background-size:26px 26px;
 }
 
