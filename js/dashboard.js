@@ -234,8 +234,11 @@ function getHotItems(expenses) {
 
 function renderGreeting() {
     const session = getSession();
-    const firstName = session ? session.name.split(" ")[0] : "there";
-    document.getElementById("dashGreeting").textContent = `Hey, ${firstName}`;
+    const displayName = session ? getSessionDisplayName(session) : "there";
+    const greetingName = session && (session.displayPreference || "name") === "name"
+        ? displayName.split(" ")[0]
+        : displayName;
+    document.getElementById("dashGreeting").textContent = `Hey, ${greetingName}`;
     document.getElementById("dashDate").textContent =
         `Here's where your money went — ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}`;
 }

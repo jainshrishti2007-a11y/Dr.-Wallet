@@ -15,6 +15,11 @@ function clearFieldErrors(form) {
     form.querySelectorAll("input, select").forEach((el) => el.classList.remove("input-error"));
 }
 
+function usernameIsTaken(username) {
+    const normalizedUsername = username.trim().toLowerCase();
+    return getUsers().some((user) => (user.username || "").trim().toLowerCase() === normalizedUsername);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     renderCaptcha("captchaText");
 
@@ -24,12 +29,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const form = document.getElementById("signupForm");
+    const usernameInput = form.username;
+
+    // Demo availability check against this browser's saved accounts. A server
+    // endpoint can replace this check when registration is connected to SQL.
+    usernameInput.addEventListener("input", () => {
+        const username = usernameInput.value.trim();
+        const errorEl = document.querySelector('[data-error-for="username"]');
+        usernameInput.classList.remove("input-error");
+        errorEl.textContent = username && usernameIsTaken(username) ? "That username is already taken" : "";
+        if (errorEl.textContent) usernameInput.classList.add("input-error");
+    });
 
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         clearFieldErrors(form);
 
         const name = form.name.value.trim();
+        const username = form.username.value.trim();
         const email = form.email.value.trim().toLowerCase();
         const phone = form.phone.value.trim();
         const pincode = form.pincode.value.trim();
@@ -43,6 +60,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (name.length < 3 || !/^[a-zA-Z\s.'-]+$/.test(name)) {
             setFieldError("name", "Please enter your full name");
+            valid = false;
+        }
+
+        if (!/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
+            setFieldError("username", "Use 3–30 letters, numbers, or underscores");
+            valid = false;
+        } else if (usernameIsTaken(username)) {
+            setFieldError("username", "That username is already taken");
             valid = false;
         }
 
@@ -92,6 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const newUser = {
             name,
+            username,
             email,
             phone,
             pincode,
