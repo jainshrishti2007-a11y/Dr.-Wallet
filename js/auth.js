@@ -69,6 +69,7 @@ function showToast(message, type = "success") {
         success: "fa-circle-check",
         error: "fa-circle-exclamation",
         info: "fa-circle-info",
+        warning: "fa-triangle-exclamation",
     };
 
     const toast = document.createElement("div");

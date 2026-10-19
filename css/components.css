@@ -37,6 +37,10 @@
     border-left-color:var(--color-primary);
 }
 
+.toast.warning{
+    border-left-color:var(--color-warning);
+}
+
 .toast i{
     font-size:18px;
     color:var(--color-accent);
@@ -48,6 +52,10 @@
 
 .toast.info i{
     color:var(--color-primary);
+}
+
+.toast.warning i{
+    color:var(--color-warning);
 }
 
 .toast.hide{

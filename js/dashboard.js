@@ -20,6 +20,15 @@ function saveDashData(data) {
     localStorage.setItem(getDashDataKey(), JSON.stringify(data));
 }
 
+function getCurrentMonthKey() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function getSelectedMonthKey() {
+    return document.getElementById("reportMonth")?.value || getCurrentMonthKey();
+}
+
 /* ---------- smart category detection ---------- */
 
 const CATEGORY_MAP = [
@@ -91,14 +100,8 @@ function isoDateOnly(d) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function isSameMonth(dateStr) {
-    const d = new Date(dateStr);
-    const now = new Date();
-    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-}
-
-function getMonthExpenses(expenses) {
-    return expenses.filter((e) => isSameMonth(e.date));
+function getMonthExpenses(expenses, monthKey = getCurrentMonthKey()) {
+    return expenses.filter((expense) => formatDateInput(expense.date).slice(0, 7) === monthKey);
 }
 
 function getLastNDays(n) {
@@ -116,8 +119,9 @@ function getLastNDays(n) {
 
 function addExpense(itemRaw, amount) {
     const data = loadDashData();
+    const beforeTotal = getMonthExpenses(data.expenses).reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
     const cat = detectCategory(itemRaw);
-    const existingKeys = [...new Set(data.expenses.map((e) => e.canonicalKey))];
+    const existingKeys = [...new Set(data.expenses.map((e) => e.canonicalKey).filter(Boolean))];
     const canonicalKey = getCanonicalKey(itemRaw, existingKeys);
 
     const expense = {
@@ -133,6 +137,9 @@ function addExpense(itemRaw, amount) {
 
     data.expenses.unshift(expense);
     saveDashData(data);
+    notifyBudgetThresholdCrossing(beforeTotal, beforeTotal + expense.amount, data.budget?.amount || 0);
+    const reportMonth = document.getElementById("reportMonth");
+    if (reportMonth) reportMonth.value = getCurrentMonthKey();
     renderAll();
 
     showToast(`Added "${expense.item}" — ₹${expense.amount}`, "success");
@@ -140,16 +147,77 @@ function addExpense(itemRaw, amount) {
 
 function deleteExpense(id) {
     const data = loadDashData();
-    data.expenses = data.expenses.filter((e) => e.id !== id);
+    const index = data.expenses.findIndex((expense) => expense.id === id);
+    if (index < 0) return;
+    const [deletedExpense] = data.expenses.splice(index, 1);
     saveDashData(data);
     renderAll();
-    showToast("Expense removed", "info");
+    showUndoToast(deletedExpense, index, getDashDataKey());
+}
+
+function showUndoToast(expense, index, storageKey) {
+    let container = document.getElementById("toast-container");
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement("div");
+    toast.className = "toast info undo-toast";
+    const icon = document.createElement("i");
+    icon.className = "fa-solid fa-circle-info";
+    const message = document.createElement("span");
+    message.textContent = `Removed ${expense.item}`;
+    const undoButton = document.createElement("button");
+    undoButton.type = "button";
+    undoButton.className = "toast-undo-btn";
+    undoButton.textContent = "Undo";
+    toast.append(icon, message, undoButton);
+    container.appendChild(toast);
+
+    let dismissed = false;
+    const dismiss = () => {
+        if (dismissed) return;
+        dismissed = true;
+        clearTimeout(timer);
+        toast.classList.add("hide");
+        setTimeout(() => toast.remove(), 300);
+    };
+
+    undoButton.addEventListener("click", () => {
+        if (dismissed) return;
+        const current = JSON.parse(localStorage.getItem(storageKey) || '{"budget":null,"expenses":[]}');
+        if (!current.expenses.some((record) => record.id === expense.id)) {
+            current.expenses.splice(Math.min(index, current.expenses.length), 0, expense);
+            localStorage.setItem(storageKey, JSON.stringify(current));
+            renderAll();
+            showToast("Expense restored", "success");
+        }
+        dismiss();
+    });
+
+    const timer = setTimeout(dismiss, 6000);
+}
+
+function notifyBudgetThresholdCrossing(beforeTotal, afterTotal, budget) {
+    if (!budget || budget <= 0) return;
+
+    if (beforeTotal < budget && afterTotal >= budget) {
+        if (afterTotal > budget) {
+            showToast(`You've exceeded your monthly budget by ₹${Math.round(afterTotal - budget).toLocaleString("en-IN")}`, "warning");
+        } else {
+            showToast("You've reached your monthly budget", "warning");
+        }
+    } else if (beforeTotal < budget * 0.8 && afterTotal >= budget * 0.8) {
+        showToast("You've used 80% of your monthly budget", "warning");
+    }
 }
 
 /* ---------- computed stats ---------- */
 
-function computeStats(data) {
-    const monthExpenses = getMonthExpenses(data.expenses);
+function computeStats(data, monthKey = getCurrentMonthKey()) {
+    const monthExpenses = getMonthExpenses(data.expenses, monthKey);
     const totalSpent = monthExpenses.reduce((s, e) => s + e.amount, 0);
     const budget = data.budget ? data.budget.amount : 0;
     const remaining = budget - totalSpent;
@@ -179,7 +247,7 @@ function computeWeeklySeries(expenses) {
 }
 
 function computeCategoryBreakdown(expenses) {
-    const monthExpenses = getMonthExpenses(expenses);
+    const monthExpenses = getMonthExpenses(expenses, getSelectedMonthKey());
     const map = {};
     monthExpenses.forEach((e) => {
         map[e.category] = (map[e.category] || 0) + e.amount;
@@ -366,12 +434,18 @@ function openBudgetModal(prefillAmount) {
         }
 
         const data = loadDashData();
+        const spentThisMonth = getMonthExpenses(data.expenses).reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
         data.budget = { amount: val, setAt: new Date().toISOString() };
         saveDashData(data);
 
         closeModal();
         renderAll();
         showToast("Budget saved!", "success");
+        if (spentThisMonth > val) {
+            showToast(`You've already exceeded this budget by ₹${Math.round(spentThisMonth - val).toLocaleString("en-IN")}`, "warning");
+        } else if (spentThisMonth >= val * 0.8) {
+            showToast("You've already used 80% of this budget", "warning");
+        }
     });
 }
 
@@ -434,12 +508,15 @@ function renderDonut() {
     const data = loadDashData();
     const wrap = document.getElementById("donutWrap");
     const breakdown = computeCategoryBreakdown(data.expenses);
+    const monthLabel = formatMonthLabel(getSelectedMonthKey());
+    const monthLabelEl = document.querySelector(".chart-back .chart-face-head span");
+    if (monthLabelEl) monthLabelEl.textContent = monthLabel;
 
     if (breakdown.length === 0) {
         wrap.innerHTML = `
             <div class="chart-empty-note">
                 <i class="fa-solid fa-chart-pie"></i>
-                No expenses this month yet.<br>Your category breakdown will show up here.
+                No expenses for ${monthLabel} yet.<br>Your category breakdown will show up here.
             </div>
         `;
         return;
@@ -460,7 +537,7 @@ function renderDonut() {
         <div class="donut-wrap" style="background:conic-gradient(${gradientParts});">
             <div class="donut-center">
                 <b>₹${totalAll.toLocaleString("en-IN")}</b>
-                <span>this month</span>
+                <span>${monthLabel}</span>
             </div>
         </div>
         <ul class="donut-legend">
@@ -525,25 +602,173 @@ function formatLedgerDate(iso) {
     return d.toLocaleDateString("en-US", { day: "numeric", month: "short" });
 }
 
+function formatMonthLabel(monthKey) {
+    const [year, month] = monthKey.split("-").map(Number);
+    return new Date(year, month - 1, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+}
+
+function renderMonthlyReport() {
+    const data = loadDashData();
+    const monthKey = getSelectedMonthKey();
+    const expenses = getMonthExpenses(data.expenses, monthKey);
+    const total = expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+    const average = expenses.length ? Math.round(total / expenses.length) : 0;
+    const report = document.getElementById("monthlyReport");
+    const currentBudget = monthKey === getCurrentMonthKey() && data.budget ? data.budget.amount : null;
+
+    report.innerHTML = `
+        <div class="monthly-report-stat">
+            <span>Total spent · ${formatMonthLabel(monthKey)}</span>
+            <strong>₹${total.toLocaleString("en-IN")}</strong>
+        </div>
+        <div class="monthly-report-stat">
+            <span>Transactions</span>
+            <strong>${expenses.length}</strong>
+        </div>
+        <div class="monthly-report-stat">
+            <span>Average per transaction</span>
+            <strong>₹${average.toLocaleString("en-IN")}</strong>
+        </div>
+        ${currentBudget ? `<div class="monthly-report-stat"><span>Monthly budget</span><strong>₹${Number(currentBudget).toLocaleString("en-IN")}</strong></div>` : ""}
+    `;
+    renderSpendingInsights(data.expenses, monthKey, total);
+}
+
+function renderSpendingInsights(allExpenses, monthKey, currentTotal) {
+    const insight = document.getElementById("monthlyInsight");
+    if (!insight) return;
+
+    const [year, month] = monthKey.split("-").map(Number);
+    const previousDate = new Date(year, month - 2, 1);
+    const previousMonthKey = `${previousDate.getFullYear()}-${String(previousDate.getMonth() + 1).padStart(2, "0")}`;
+    const previousExpenses = getMonthExpenses(allExpenses, previousMonthKey);
+    const previousTotal = previousExpenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+    const currentExpenses = getMonthExpenses(allExpenses, monthKey);
+
+    let headline;
+    let detail = "";
+    let trend = "steady";
+    if (currentTotal === 0 && previousTotal === 0) {
+        headline = "Your spending insights will appear here";
+        detail = "Log expenses for this month to start building a spending comparison.";
+    } else if (previousTotal === 0) {
+        headline = `You’ve spent ₹${currentTotal.toLocaleString("en-IN")} this month`;
+        detail = `There’s no spending history for ${formatMonthLabel(previousMonthKey)} to compare yet.`;
+        trend = "up";
+    } else if (currentTotal === 0) {
+        headline = `No spending recorded for ${formatMonthLabel(monthKey)} yet`;
+        detail = `You spent ₹${previousTotal.toLocaleString("en-IN")} in ${formatMonthLabel(previousMonthKey)}.`;
+        trend = "down";
+    } else {
+        const difference = currentTotal - previousTotal;
+        const percent = Math.round(Math.abs(difference / previousTotal) * 100);
+        if (difference > 0) {
+            headline = `Spending is up ${percent}% from last month`;
+            detail = `That’s ₹${difference.toLocaleString("en-IN")} more than ${formatMonthLabel(previousMonthKey)}.`;
+            trend = "up";
+        } else if (difference < 0) {
+            headline = `Spending is down ${percent}% from last month`;
+            detail = `You’ve spent ₹${Math.abs(difference).toLocaleString("en-IN")} less than ${formatMonthLabel(previousMonthKey)}.`;
+            trend = "down";
+        } else {
+            headline = "Your spending matches last month";
+            detail = `You’ve spent ₹${currentTotal.toLocaleString("en-IN")} in both months.`;
+        }
+
+        const categoryTotals = (expenses) => expenses.reduce((totals, expense) => {
+            totals[expense.category] = (totals[expense.category] || 0) + Number(expense.amount || 0);
+            return totals;
+        }, {});
+        const thisCategories = categoryTotals(currentExpenses);
+        const lastCategories = categoryTotals(previousExpenses);
+        const biggestIncrease = Object.entries(thisCategories)
+            .map(([category, amount]) => ({ category, difference: amount - (lastCategories[category] || 0) }))
+            .filter((entry) => entry.difference > 0)
+            .sort((a, b) => b.difference - a.difference)[0];
+        if (biggestIncrease) {
+            detail += ` ${biggestIncrease.category} is your biggest increase (+₹${biggestIncrease.difference.toLocaleString("en-IN")}).`;
+        }
+    }
+
+    insight.className = `monthly-insight trend-${trend}`;
+    insight.innerHTML = `<i class="fa-solid ${trend === "up" ? "fa-arrow-trend-up" : trend === "down" ? "fa-arrow-trend-down" : "fa-lightbulb"}" aria-hidden="true"></i><div><strong>${escapeHtml(headline)}</strong><span>${escapeHtml(detail)}</span></div>`;
+}
+
+function getFilteredLedgerExpenses(expenses) {
+    const query = document.getElementById("ledgerSearch").value.trim().toLowerCase();
+    const category = document.getElementById("ledgerCategory").value;
+    const fromDate = document.getElementById("ledgerDateFrom").value;
+    const toDate = document.getElementById("ledgerDateTo").value;
+    const minValue = document.getElementById("ledgerMinAmount").value;
+    const maxValue = document.getElementById("ledgerMaxAmount").value;
+    const minAmount = minValue === "" ? null : Number(minValue);
+    const maxAmount = maxValue === "" ? null : Number(maxValue);
+
+    const filtered = expenses.filter((expense) => {
+        const matchesQuery = !query || `${expense.item} ${expense.category}`.toLowerCase().includes(query);
+        const matchesCategory = category === "all" || expense.category === category;
+        const expenseDate = formatDateInput(expense.date);
+        const matchesDate = (!fromDate || expenseDate >= fromDate) && (!toDate || expenseDate <= toDate);
+        const amount = Number(expense.amount || 0);
+        const matchesAmount = (minAmount === null || amount >= minAmount) && (maxAmount === null || amount <= maxAmount);
+        return matchesQuery && matchesCategory && matchesDate && matchesAmount;
+    });
+    const sortBy = document.getElementById("ledgerSort")?.value || "newest";
+    const sorters = {
+        newest: (a, b) => new Date(b.date) - new Date(a.date),
+        oldest: (a, b) => new Date(a.date) - new Date(b.date),
+        highest: (a, b) => Number(b.amount) - Number(a.amount),
+        lowest: (a, b) => Number(a.amount) - Number(b.amount),
+    };
+    return filtered.sort(sorters[sortBy] || sorters.newest);
+}
+
+function ledgerFiltersAreActive() {
+    return Boolean(
+        document.getElementById("ledgerSearch").value.trim() ||
+        document.getElementById("ledgerCategory").value !== "all" ||
+        document.getElementById("ledgerDateFrom").value ||
+        document.getElementById("ledgerDateTo").value ||
+        document.getElementById("ledgerMinAmount").value ||
+        document.getElementById("ledgerMaxAmount").value
+    );
+}
+
 function renderLedger() {
     const data = loadDashData();
-    const monthExpenses = getMonthExpenses(data.expenses);
+    const monthKey = getSelectedMonthKey();
+    const monthExpenses = getMonthExpenses(data.expenses, monthKey);
+    const visibleExpenses = getFilteredLedgerExpenses(monthExpenses);
     const list = document.getElementById("ledgerList");
     const countEl = document.getElementById("ledgerCount");
+    const filtersActive = ledgerFiltersAreActive();
 
-    countEl.textContent = monthExpenses.length ? `${monthExpenses.length} entries` : "";
+    document.getElementById("ledgerTitle").textContent = `${formatMonthLabel(monthKey)} Transactions`;
+    countEl.textContent = filtersActive
+        ? `${visibleExpenses.length} of ${monthExpenses.length} entries`
+        : `${monthExpenses.length} ${monthExpenses.length === 1 ? "entry" : "entries"}`;
 
     if (monthExpenses.length === 0) {
         list.innerHTML = `
             <div class="ledger-empty">
                 <i class="fa-solid fa-receipt"></i>
-                No expenses yet — add your first one above.
+                No expenses recorded for ${formatMonthLabel(monthKey)}.
             </div>
         `;
         return;
     }
 
-    list.innerHTML = monthExpenses
+    if (visibleExpenses.length === 0) {
+        list.innerHTML = `
+            <div class="ledger-empty">
+                <i class="fa-solid fa-filter-circle-xmark"></i>
+                No transactions match these filters.
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = visibleExpenses
         .map((e) => {
             const st = styleForCategory(e.category);
             const icon = e.icon || st.icon;
@@ -554,24 +779,219 @@ function renderLedger() {
                 <i class="fa-solid ${icon}"></i>
             </div>
             <div class="ledger-item-info">
-                <b>${e.item}</b>
+                <b>${escapeHtml(e.item)}</b>
                 <div class="ledger-item-meta">
                     <span class="cat-pill">${e.category}</span>
                     <span>${formatLedgerDate(e.date)}</span>
                 </div>
             </div>
-            <div class="ledger-item-amount">− ₹${e.amount}</div>
-            <button type="button" class="ledger-delete-btn" data-id="${e.id}" aria-label="Delete expense">
-                <i class="fa-solid fa-trash"></i>
-            </button>
+            <div class="ledger-item-amount">− ₹${Number(e.amount).toLocaleString("en-IN")}</div>
+            <div class="ledger-row-actions">
+                <button type="button" class="ledger-edit-btn" data-id="${e.id}" aria-label="Edit ${escapeHtml(e.item)}">
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+                <button type="button" class="ledger-delete-btn" data-id="${e.id}" aria-label="Delete ${escapeHtml(e.item)}">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
         </div>
     `;
         })
         .join("");
 
+    list.querySelectorAll(".ledger-edit-btn").forEach((btn) => {
+        btn.addEventListener("click", () => openExpenseEditModal(btn.dataset.id));
+    });
     list.querySelectorAll(".ledger-delete-btn").forEach((btn) => {
         btn.addEventListener("click", () => deleteExpense(btn.dataset.id));
     });
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+    })[character]);
+}
+
+function formatDateInput(isoDate) {
+    const date = new Date(isoDate);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function openExpenseEditModal(expenseId) {
+    const data = loadDashData();
+    const expense = data.expenses.find((record) => record.id === expenseId);
+    if (!expense) return;
+
+    const oldOverlay = document.getElementById("expenseEditOverlay");
+    if (oldOverlay) oldOverlay.remove();
+
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+    overlay.id = "expenseEditOverlay";
+    overlay.innerHTML = `
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Edit Expense</h3>
+                <button type="button" class="modal-close" id="closeExpenseEdit" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="expenseEditForm" novalidate>
+                <div class="form-group">
+                    <label for="editExpenseItem">Item</label>
+                    <input type="text" id="editExpenseItem" name="item" value="${escapeHtml(expense.item)}" maxlength="100" required>
+                    <span class="error-text" data-error-for="item"></span>
+                </div>
+                <div class="form-group">
+                    <label for="editExpenseAmount">Amount (₹)</label>
+                    <input type="number" id="editExpenseAmount" name="amount" min="1" step="1" value="${Number(expense.amount)}" required>
+                    <span class="error-text" data-error-for="amount"></span>
+                </div>
+                <div class="form-group">
+                    <label for="editExpenseDate">Date</label>
+                    <input type="date" id="editExpenseDate" name="date" value="${formatDateInput(expense.date)}" required>
+                    <span class="error-text" data-error-for="date"></span>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost" id="cancelExpenseEdit">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("open"));
+
+    const closeModal = () => {
+        overlay.classList.remove("open");
+        setTimeout(() => overlay.remove(), 250);
+    };
+    overlay.querySelector("#closeExpenseEdit").addEventListener("click", closeModal);
+    overlay.querySelector("#cancelExpenseEdit").addEventListener("click", closeModal);
+    overlay.addEventListener("click", (event) => {
+        if (event.target === overlay) closeModal();
+    });
+
+    overlay.querySelector("#expenseEditForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        form.querySelectorAll(".error-text").forEach((error) => (error.textContent = ""));
+
+        const item = form.elements.namedItem("item").value.trim();
+        const amount = Number(form.elements.namedItem("amount").value);
+        const dateValue = form.elements.namedItem("date").value;
+        let valid = true;
+
+        if (item.length < 2) {
+            form.querySelector('[data-error-for="item"]').textContent = "Enter an item name";
+            valid = false;
+        }
+        if (!Number.isFinite(amount) || amount <= 0) {
+            form.querySelector('[data-error-for="amount"]').textContent = "Enter an amount greater than zero";
+            valid = false;
+        }
+        if (!dateValue || Number.isNaN(new Date(`${dateValue}T12:00:00`).getTime())) {
+            form.querySelector('[data-error-for="date"]').textContent = "Choose a valid date";
+            valid = false;
+        }
+        if (!valid) return;
+
+        const latestData = loadDashData();
+        const current = latestData.expenses.find((record) => record.id === expenseId);
+        if (!current) return closeModal();
+
+        const beforeTotal = getMonthExpenses(latestData.expenses).reduce((sum, record) => sum + Number(record.amount || 0), 0);
+        const category = detectCategory(item);
+        const existingKeys = [...new Set(latestData.expenses.filter((record) => record.id !== expenseId).map((record) => record.canonicalKey).filter(Boolean))];
+        latestData.expenses = latestData.expenses.map((record) => record.id === expenseId
+            ? {
+                ...record,
+                item,
+                amount,
+                date: new Date(`${dateValue}T12:00:00`).toISOString(),
+                category: category.name,
+                icon: category.icon,
+                color: category.color,
+                canonicalKey: getCanonicalKey(item, existingKeys),
+            }
+            : record
+        );
+        const afterTotal = getMonthExpenses(latestData.expenses).reduce((sum, record) => sum + Number(record.amount || 0), 0);
+        saveDashData(latestData);
+        notifyBudgetThresholdCrossing(beforeTotal, afterTotal, latestData.budget?.amount || 0);
+        closeModal();
+        renderAll();
+        showToast("Expense updated", "success");
+    });
+}
+
+function csvCell(value) {
+    return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+
+function exportLedgerCsv() {
+    const monthKey = getSelectedMonthKey();
+    const expenses = getFilteredLedgerExpenses(getMonthExpenses(loadDashData().expenses, monthKey));
+    if (expenses.length === 0) {
+        showToast("There are no matching transactions to export", "info");
+        return;
+    }
+
+    const rows = [
+        ["Date", "Item", "Category", "Amount (INR)"],
+        ...expenses.map((expense) => [
+            formatDateInput(expense.date),
+            expense.item,
+            expense.category,
+            Number(expense.amount || 0),
+        ]),
+    ];
+    const csv = `\uFEFF${rows.map((row) => row.map(csvCell).join(",")).join("\r\n")}`;
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const download = document.createElement("a");
+    download.href = url;
+    download.download = `dr-wallet-transactions-${monthKey}.csv`;
+    document.body.appendChild(download);
+    download.click();
+    download.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast(`Exported ${expenses.length} transaction${expenses.length === 1 ? "" : "s"}`, "success");
+}
+
+function initLedgerControls() {
+    const reportMonth = document.getElementById("reportMonth");
+    reportMonth.value = getCurrentMonthKey();
+
+    const categoryFilter = document.getElementById("ledgerCategory");
+    CATEGORY_MAP.map((category) => category.name).concat(DEFAULT_CATEGORY.name).forEach((category) => {
+        categoryFilter.add(new Option(category, category));
+    });
+
+    ["ledgerSearch", "ledgerCategory", "ledgerSort", "ledgerDateFrom", "ledgerDateTo", "ledgerMinAmount", "ledgerMaxAmount"]
+        .forEach((id) => {
+            const control = document.getElementById(id);
+            control.addEventListener(id === "ledgerSearch" || id.includes("Amount") ? "input" : "change", renderLedger);
+        });
+
+    reportMonth.addEventListener("change", () => {
+        renderMonthlyReport();
+        renderDonut();
+        renderLedger();
+    });
+    document.getElementById("clearLedgerFilters").addEventListener("click", () => {
+        ["ledgerSearch", "ledgerDateFrom", "ledgerDateTo", "ledgerMinAmount", "ledgerMaxAmount"].forEach((id) => {
+            document.getElementById(id).value = "";
+        });
+        categoryFilter.value = "all";
+        renderLedger();
+    });
+    document.getElementById("exportCsvBtn").addEventListener("click", exportLedgerCsv);
 }
 
 /* ---------- 3D flip card ---------- */
@@ -700,6 +1120,7 @@ function initQuickAddForm() {
 function renderAll() {
     renderGreeting();
     renderBudget();
+    renderMonthlyReport();
     renderWeeklyChart();
     renderDonut();
     renderHotTopics();
@@ -707,6 +1128,7 @@ function renderAll() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    initLedgerControls();
     renderAll();
     initFlipCard();
     initQuickAddForm();
