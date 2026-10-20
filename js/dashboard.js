@@ -13,7 +13,9 @@ function getDashDataKey() {
 
 function loadDashData() {
     const raw = localStorage.getItem(getDashDataKey());
-    return raw ? JSON.parse(raw) : { budget: null, expenses: [] };
+    const data = raw ? JSON.parse(raw) : { budget: null, expenses: [] };
+    data.fixedCosts = Array.isArray(data.fixedCosts) ? data.fixedCosts : [];
+    return data;
 }
 
 function saveDashData(data) {
@@ -137,7 +139,8 @@ function addExpense(itemRaw, amount) {
 
     data.expenses.unshift(expense);
     saveDashData(data);
-    notifyBudgetThresholdCrossing(beforeTotal, beforeTotal + expense.amount, data.budget?.amount || 0);
+    const fixedTotal = data.fixedCosts.reduce((sum, cost) => sum + Number(cost.amount || 0), 0);
+    notifyBudgetThresholdCrossing(beforeTotal + fixedTotal, beforeTotal + fixedTotal + expense.amount, data.budget?.amount || 0);
     const reportMonth = document.getElementById("reportMonth");
     if (reportMonth) reportMonth.value = getCurrentMonthKey();
     renderAll();
@@ -220,7 +223,8 @@ function computeStats(data, monthKey = getCurrentMonthKey()) {
     const monthExpenses = getMonthExpenses(data.expenses, monthKey);
     const totalSpent = monthExpenses.reduce((s, e) => s + e.amount, 0);
     const budget = data.budget ? data.budget.amount : 0;
-    const remaining = budget - totalSpent;
+    const fixedCosts = (data.fixedCosts || []).reduce((sum, cost) => sum + Number(cost.amount || 0), 0);
+    const remaining = budget - fixedCosts - totalSpent;
 
     const todayKey = isoDateOnly(new Date());
     const todaySpent = monthExpenses
@@ -232,7 +236,7 @@ function computeStats(data, monthKey = getCurrentMonthKey()) {
     const daysLeft = daysInMonth - now.getDate() + 1;
     const avgPerDayRemaining = daysLeft > 0 ? Math.max(remaining, 0) / daysLeft : 0;
 
-    return { totalSpent, budget, remaining, todaySpent, daysLeft, avgPerDayRemaining };
+    return { totalSpent, budget, fixedCosts, remaining, todaySpent, daysLeft, avgPerDayRemaining };
 }
 
 function computeWeeklySeries(expenses) {
@@ -334,7 +338,7 @@ function renderBudget() {
     }
 
     const stats = computeStats(data);
-    const pct = stats.budget > 0 ? Math.min(100, (stats.totalSpent / stats.budget) * 100) : 0;
+    const pct = stats.budget > 0 ? Math.min(100, ((stats.totalSpent + stats.fixedCosts) / stats.budget) * 100) : 0;
     const fillClass = pct >= 100 ? "over" : pct >= 80 ? "warn" : "";
 
     container.innerHTML = `
@@ -352,29 +356,274 @@ function renderBudget() {
             <div class="budget-progress-track">
                 <div class="budget-progress-fill ${fillClass}" style="width:${pct}%"></div>
             </div>
+            <p class="budget-allocation-note">${stats.fixedCosts ? `₹${stats.fixedCosts.toLocaleString("en-IN")} set aside for essentials` : "Add rent or other essentials below to set them aside"} · ₹${Math.round(stats.avgPerDayRemaining).toLocaleString("en-IN")} a day available for the rest of this month</p>
 
             <div class="stat-grid">
                 <div class="stat-box">
-                    <span>Budget</span>
+                    <span>Monthly money</span>
                     <b>₹${stats.budget.toLocaleString("en-IN")}</b>
                 </div>
                 <div class="stat-box danger">
-                    <span>Spent</span>
+                    <span>Everyday spent</span>
                     <b>₹${stats.totalSpent.toLocaleString("en-IN")}</b>
                 </div>
-                <div class="stat-box accent">
-                    <span>Remaining</span>
-                    <b>₹${Math.max(stats.remaining, 0).toLocaleString("en-IN")}</b>
+                <div class="stat-box fixed-stat">
+                    <span>Essentials set aside</span>
+                    <b>₹${stats.fixedCosts.toLocaleString("en-IN")}</b>
                 </div>
-                <div class="stat-box">
-                    <span>Per Day Left</span>
-                    <b>₹${Math.round(stats.avgPerDayRemaining).toLocaleString("en-IN")}</b>
+                <div class="stat-box accent ${stats.remaining < 0 ? "overcommitted" : ""}">
+                    <span>For everyday use</span>
+                    <b>₹${stats.remaining.toLocaleString("en-IN")}</b>
                 </div>
             </div>
         </div>
     `;
 
     document.getElementById("editBudgetBtn").addEventListener("click", () => openBudgetModal(stats.budget));
+}
+
+/* ---------- recurring essentials ---------- */
+
+const FIXED_COST_CATEGORIES = ["Rent / PG", "Hostel fee", "Utilities", "Wi-Fi / Phone", "Other"];
+const FIXED_COST_ICONS = { "Rent / PG": "fa-house", "Hostel fee": "fa-building", Utilities: "fa-bolt", "Wi-Fi / Phone": "fa-wifi", Other: "fa-repeat" };
+
+function fixedCostDueCopy(cost, monthKey) {
+    if (cost.paidMonth === monthKey) return "Paid this month";
+    const [year, month] = monthKey.split("-").map(Number);
+    const lastDay = new Date(year, month, 0).getDate();
+    const dueDay = Math.min(Number(cost.dueDay) || 1, lastDay);
+    if (monthKey !== getCurrentMonthKey()) return `Due on the ${dueDay}${ordinalSuffix(dueDay)}`;
+    const today = new Date().getDate();
+    if (today === dueDay) return "Due today";
+    if (today > dueDay) return `Due ${today - dueDay} day${today - dueDay === 1 ? "" : "s"} ago`;
+    return `Due in ${dueDay - today} day${dueDay - today === 1 ? "" : "s"}`;
+}
+
+function ordinalSuffix(day) {
+    if (day > 10 && day < 14) return "th";
+    return ["th", "st", "nd", "rd"][day % 10] || "th";
+}
+
+function renderFixedCostRow(cost, monthKey, includeActions = false) {
+    const isPaid = cost.paidMonth === monthKey;
+    return `<article class="fixed-cost-row ${includeActions ? "" : "fixed-cost-preview-row"}">
+        <div class="fixed-cost-icon"><i class="fa-solid ${FIXED_COST_ICONS[cost.category] || "fa-receipt"}"></i></div>
+        <div class="fixed-cost-info"><strong>${escapeHtml(cost.name)}</strong><span>${escapeHtml(cost.category)} · ${fixedCostDueCopy(cost, monthKey)}</span></div>
+        <strong class="fixed-cost-amount">₹${Number(cost.amount).toLocaleString("en-IN")}</strong>
+        ${includeActions ? `<div class="fixed-cost-row-actions">
+            <button type="button" class="fixed-cost-paid ${isPaid ? "is-paid" : ""}" data-fixed-paid="${escapeHtml(cost.id)}" aria-label="${isPaid ? "Mark unpaid" : "Mark paid"}: ${escapeHtml(cost.name)}"><i class="fa-solid fa-check"></i>${isPaid ? "Paid" : "Mark paid"}</button>
+            <button type="button" class="fixed-cost-edit" data-fixed-edit="${escapeHtml(cost.id)}" aria-label="Edit ${escapeHtml(cost.name)}"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" class="fixed-cost-delete" data-fixed-delete="${escapeHtml(cost.id)}" aria-label="Remove ${escapeHtml(cost.name)}"><i class="fa-solid fa-xmark"></i></button>
+        </div>` : ""}
+    </article>`;
+}
+
+function renderFixedCosts() {
+    const container = document.getElementById("fixedCostsContainer");
+    if (!container) return;
+    const data = loadDashData();
+    const monthKey = getCurrentMonthKey();
+    const total = data.fixedCosts.reduce((sum, cost) => sum + Number(cost.amount || 0), 0);
+    const previewCost = data.fixedCosts[0];
+
+    container.innerHTML = `
+        <div class="fixed-cost-card">
+            <div class="fixed-cost-head">
+                <div>
+                    <span class="fixed-cost-eyebrow"><i class="fa-solid fa-shield-heart"></i> PROTECT YOUR ESSENTIALS</span>
+                    <h3>Fixed monthly costs</h3>
+                    <p>Set aside first. Keep them out of your everyday spending.</p>
+                </div>
+                <button type="button" class="fixed-cost-add" id="addFixedCostBtn"><i class="fa-solid fa-plus"></i><span>Add cost</span></button>
+            </div>
+            <div class="fixed-cost-total"><strong>₹${total.toLocaleString("en-IN")}</strong><span>reserved each month</span></div>
+            ${previewCost ? `<div class="fixed-cost-preview">${renderFixedCostRow(previewCost, monthKey)}<button type="button" class="fixed-cost-view-all" id="openFixedCostManager" aria-label="Manage all ${data.fixedCosts.length} monthly costs"><i class="fa-solid fa-layer-group"></i><span>${data.fixedCosts.length > 1 ? `View all ${data.fixedCosts.length}` : "Manage cost"}</span><i class="fa-solid fa-arrow-up-right-from-square"></i></button></div>` : `<div class="fixed-cost-empty">
+                <div class="fixed-cost-empty-icon"><i class="fa-solid fa-house-circle-check"></i></div>
+                <div class="fixed-cost-empty-copy"><strong>Give your essentials their own place.</strong><span>Add rent, PG or hostel fees, utilities, and other monthly costs. They’ll be set aside before your everyday spending is calculated.</span></div>
+                <div class="fixed-cost-examples"><span>Rent / PG</span><span>Hostel</span><span>Utilities</span></div>
+            </div>`}
+            <div class="fixed-cost-footnote"><i class="fa-solid fa-lock"></i><span>Reserved separately from your daily ledger</span></div>
+        </div>`;
+
+    document.getElementById("addFixedCostBtn").addEventListener("click", () => openFixedCostModal());
+    document.getElementById("openFixedCostManager")?.addEventListener("click", openFixedCostManager);
+}
+
+function openFixedCostManager() {
+    document.getElementById("fixedCostManagerOverlay")?.remove();
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay fixed-cost-manager-overlay";
+    overlay.id = "fixedCostManagerOverlay";
+    overlay.setAttribute("role", "presentation");
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const close = () => {
+        overlay.classList.remove("open");
+        document.body.style.overflow = previousOverflow;
+        document.removeEventListener("keydown", onKeydown);
+        setTimeout(() => overlay.remove(), 220);
+    };
+    const onKeydown = (event) => { if (event.key === "Escape") close(); };
+
+    const renderList = () => {
+        const data = loadDashData();
+        const total = data.fixedCosts.reduce((sum, cost) => sum + Number(cost.amount || 0), 0);
+        const monthKey = getCurrentMonthKey();
+        overlay.innerHTML = `<section class="fixed-cost-manager-modal" role="dialog" aria-modal="true" aria-labelledby="fixedCostManagerTitle">
+            <div class="fixed-cost-manager-head"><div><span class="fixed-cost-eyebrow"><i class="fa-solid fa-shield-heart"></i> PROTECT YOUR ESSENTIALS</span><h2 id="fixedCostManagerTitle">Monthly essentials</h2><p>Your recurring costs, all in one place.</p></div><button type="button" class="modal-close fixed-cost-manager-close" aria-label="Close monthly essentials"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="fixed-cost-manager-total"><span>Total reserved each month</span><strong>₹${total.toLocaleString("en-IN")}</strong></div>
+            <div class="fixed-cost-list fixed-cost-manager-list">${data.fixedCosts.map((cost) => renderFixedCostRow(cost, monthKey, true)).join("")}</div>
+            <button type="button" class="fixed-cost-manager-add"><i class="fa-solid fa-plus"></i> Add another monthly cost</button>
+        </section>`;
+
+        overlay.querySelector(".fixed-cost-manager-close").addEventListener("click", close);
+        overlay.querySelector(".fixed-cost-manager-add").addEventListener("click", () => {
+            overlay.remove();
+            document.body.style.overflow = previousOverflow;
+            document.removeEventListener("keydown", onKeydown);
+            openFixedCostModal();
+        });
+        overlay.querySelectorAll("[data-fixed-paid]").forEach((button) => button.addEventListener("click", () => {
+            const latest = loadDashData();
+            const cost = latest.fixedCosts.find((item) => item.id === button.dataset.fixedPaid);
+            if (!cost) return;
+            cost.paidMonth = cost.paidMonth === monthKey ? "" : monthKey;
+            saveDashData(latest);
+            renderAll();
+            renderList();
+        }));
+        overlay.querySelectorAll("[data-fixed-edit]").forEach((button) => button.addEventListener("click", () => {
+            const cost = loadDashData().fixedCosts.find((item) => item.id === button.dataset.fixedEdit);
+            if (!cost) return;
+            overlay.remove();
+            document.body.style.overflow = previousOverflow;
+            document.removeEventListener("keydown", onKeydown);
+            openFixedCostModal(cost);
+        }));
+        overlay.querySelectorAll("[data-fixed-delete]").forEach((button) => button.addEventListener("click", () => {
+            const latest = loadDashData();
+            const cost = latest.fixedCosts.find((item) => item.id === button.dataset.fixedDelete);
+            if (!cost || !window.confirm(`Remove ${cost.name} from your monthly essentials?`)) return;
+            latest.fixedCosts = latest.fixedCosts.filter((item) => item.id !== cost.id);
+            saveDashData(latest);
+            renderAll();
+            if (latest.fixedCosts.length) renderList();
+            else close();
+            showToast("Monthly essential removed", "success");
+        }));
+    };
+
+    renderList();
+    overlay.addEventListener("click", (event) => { if (event.target === overlay) close(); });
+    document.addEventListener("keydown", onKeydown);
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("open"));
+}
+
+function openFixedCostModal(existingCost = null) {
+    document.getElementById("fixedCostModalOverlay")?.remove();
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+    overlay.id = "fixedCostModalOverlay";
+    const cost = existingCost || {};
+    overlay.innerHTML = `
+        <div class="modal-box fixed-cost-modal">
+            <div class="modal-head"><h3>${existingCost ? "Edit monthly essential" : "Add a monthly essential"}</h3><button type="button" class="modal-close" id="closeFixedCostModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>
+            <p class="fixed-cost-modal-copy">Reserve rent, hostel fees, or another recurring bill before planning your everyday budget.</p>
+            <form id="fixedCostForm" novalidate>
+                <div class="form-group"><label for="fixedCostName">What is it?</label><input id="fixedCostName" name="name" maxlength="50" placeholder="e.g. PG rent" value="${escapeHtml(cost.name || "")}" required><span class="error-text" data-error-for="name"></span></div>
+                <div class="fixed-cost-form-row">
+                    <div class="form-group"><label for="fixedCostAmount">Amount (₹)</label><input id="fixedCostAmount" name="amount" type="number" min="1" step="1" inputmode="decimal" placeholder="10000" value="${cost.amount || ""}" required><span class="error-text" data-error-for="amount"></span></div>
+                    <div class="form-group"><label for="fixedCostDay">Due day each month</label><input id="fixedCostDay" name="dueDay" type="number" min="1" max="31" step="1" value="${cost.dueDay || 1}" required><span class="error-text" data-error-for="dueDay"></span></div>
+                </div>
+                <div class="form-group"><label for="fixedCostCategory">Type or choose</label><div class="fixed-cost-type-picker">
+                    <input id="fixedCostCategory" name="category" maxlength="30" autocomplete="off" placeholder="Type a cost type" value="${escapeHtml(cost.category || "")}" aria-controls="fixedCostCategoryMenu" aria-expanded="false" required>
+                    <button type="button" class="fixed-cost-type-toggle" id="fixedCostCategoryToggle" aria-label="Show suggested types" aria-expanded="false"><i class="fa-solid fa-chevron-down"></i></button>
+                    <div class="fixed-cost-type-menu" id="fixedCostCategoryMenu" role="listbox" hidden>${FIXED_COST_CATEGORIES.map((category) => `<button type="button" role="option" class="fixed-cost-type-option" data-type-value="${category}"><i class="fa-solid ${category === "Rent / PG" ? "fa-house" : category === "Hostel fee" ? "fa-building" : category === "Utilities" ? "fa-bolt" : category === "Wi-Fi / Phone" ? "fa-wifi" : "fa-tag"}"></i><span>${category}</span></button>`).join("")}</div>
+                </div><span class="error-text" data-error-for="category"></span></div>
+                <div class="fixed-cost-modal-note"><i class="fa-solid fa-circle-info"></i><span>This amount is reserved automatically every month. Mark it paid when you send it; it won't be added to your daily ledger.</span></div>
+                <div class="modal-actions"><button type="button" class="btn btn-ghost" id="cancelFixedCostModal">Cancel</button><button type="submit" class="btn btn-primary">${existingCost ? "Save changes" : "Add essential"}</button></div>
+            </form>
+        </div>`;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("open"));
+    const close = () => { overlay.classList.remove("open"); setTimeout(() => overlay.remove(), 250); };
+    overlay.querySelector("#closeFixedCostModal").addEventListener("click", close);
+    overlay.querySelector("#cancelFixedCostModal").addEventListener("click", close);
+    const categoryInput = overlay.querySelector("#fixedCostCategory");
+    const categoryMenu = overlay.querySelector("#fixedCostCategoryMenu");
+    const categoryToggle = overlay.querySelector("#fixedCostCategoryToggle");
+    const setCategoryMenuOpen = (open) => {
+        categoryMenu.hidden = !open;
+        categoryInput.setAttribute("aria-expanded", String(open));
+        categoryToggle.setAttribute("aria-expanded", String(open));
+    };
+    const filterCategoryOptions = () => {
+        const query = categoryInput.value.trim().toLowerCase();
+        let matches = 0;
+        categoryMenu.querySelectorAll("[data-type-value]").forEach((option) => {
+            const visible = !query || option.dataset.typeValue.toLowerCase().includes(query);
+            option.hidden = !visible;
+            if (visible) matches += 1;
+        });
+        setCategoryMenuOpen(true);
+        categoryMenu.classList.toggle("has-custom-value", Boolean(query) && !matches);
+    };
+    categoryToggle.addEventListener("click", () => {
+        if (categoryMenu.hidden) filterCategoryOptions();
+        else setCategoryMenuOpen(false);
+    });
+    categoryInput.addEventListener("input", filterCategoryOptions);
+    categoryInput.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowDown") {
+            event.preventDefault();
+            if (categoryMenu.hidden) filterCategoryOptions();
+            categoryMenu.querySelector("[data-type-value]:not([hidden])")?.focus();
+        } else if (event.key === "Escape") {
+            setCategoryMenuOpen(false);
+        }
+    });
+    categoryMenu.querySelectorAll("[data-type-value]").forEach((option) => option.addEventListener("click", () => {
+        categoryInput.value = option.dataset.typeValue;
+        categoryMenu.classList.remove("has-custom-value");
+        setCategoryMenuOpen(false);
+        categoryInput.focus();
+    }));
+    overlay.addEventListener("click", (event) => {
+        if (event.target === overlay) close();
+        else if (!event.target.closest(".fixed-cost-type-picker")) setCategoryMenuOpen(false);
+    });
+    overlay.querySelector("#fixedCostForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const name = form.elements.name.value.trim();
+        const amount = Number(form.elements.amount.value);
+        const dueDay = Number(form.elements.dueDay.value);
+        const enteredCategory = form.elements.category.value.trim();
+        form.querySelectorAll(".error-text").forEach((el) => { el.textContent = ""; });
+        let valid = true;
+        if (name.length < 2) { form.querySelector('[data-error-for="name"]').textContent = "Add a short name for this cost"; valid = false; }
+        if (!Number.isFinite(amount) || amount <= 0) { form.querySelector('[data-error-for="amount"]').textContent = "Enter an amount greater than zero"; valid = false; }
+        if (!Number.isInteger(dueDay) || dueDay < 1 || dueDay > 31) { form.querySelector('[data-error-for="dueDay"]').textContent = "Choose a day from 1 to 31"; valid = false; }
+        if (!enteredCategory) { form.querySelector('[data-error-for="category"]').textContent = "Choose a type or type your own"; valid = false; }
+        if (!valid) return;
+        const latest = loadDashData();
+        const category = enteredCategory;
+        const nextCost = { id: existingCost?.id || `fixed-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name, amount, dueDay, category, paidMonth: existingCost?.paidMonth || "" };
+        if (existingCost) latest.fixedCosts = latest.fixedCosts.map((item) => item.id === existingCost.id ? nextCost : item);
+        else latest.fixedCosts.push(nextCost);
+        saveDashData(latest);
+        close();
+        renderAll();
+        const committed = latest.fixedCosts.reduce((sum, item) => sum + Number(item.amount || 0), 0)
+            + getMonthExpenses(latest.expenses).reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+        if (latest.budget && committed > Number(latest.budget.amount || 0)) {
+            showToast("Essentials and everyday spending are above this month's budget", "warning");
+        } else {
+            showToast(existingCost ? "Monthly essential updated" : "Monthly essential added and set aside", "success");
+        }
+    });
 }
 
 function openBudgetModal(prefillAmount) {
@@ -434,7 +683,8 @@ function openBudgetModal(prefillAmount) {
         }
 
         const data = loadDashData();
-        const spentThisMonth = getMonthExpenses(data.expenses).reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+        const spentThisMonth = getMonthExpenses(data.expenses).reduce((sum, expense) => sum + Number(expense.amount || 0), 0)
+            + data.fixedCosts.reduce((sum, cost) => sum + Number(cost.amount || 0), 0);
         data.budget = { amount: val, setAt: new Date().toISOString() };
         saveDashData(data);
 
@@ -906,7 +1156,8 @@ function openExpenseEditModal(expenseId) {
         const current = latestData.expenses.find((record) => record.id === expenseId);
         if (!current) return closeModal();
 
-        const beforeTotal = getMonthExpenses(latestData.expenses).reduce((sum, record) => sum + Number(record.amount || 0), 0);
+        const beforeTotal = getMonthExpenses(latestData.expenses).reduce((sum, record) => sum + Number(record.amount || 0), 0)
+            + latestData.fixedCosts.reduce((sum, fixedCost) => sum + Number(fixedCost.amount || 0), 0);
         const category = detectCategory(item);
         const existingKeys = [...new Set(latestData.expenses.filter((record) => record.id !== expenseId).map((record) => record.canonicalKey).filter(Boolean))];
         latestData.expenses = latestData.expenses.map((record) => record.id === expenseId
@@ -922,7 +1173,8 @@ function openExpenseEditModal(expenseId) {
             }
             : record
         );
-        const afterTotal = getMonthExpenses(latestData.expenses).reduce((sum, record) => sum + Number(record.amount || 0), 0);
+        const afterTotal = getMonthExpenses(latestData.expenses).reduce((sum, record) => sum + Number(record.amount || 0), 0)
+            + latestData.fixedCosts.reduce((sum, fixedCost) => sum + Number(fixedCost.amount || 0), 0);
         saveDashData(latestData);
         notifyBudgetThresholdCrossing(beforeTotal, afterTotal, latestData.budget?.amount || 0);
         closeModal();
@@ -989,6 +1241,8 @@ function initLedgerControls() {
             document.getElementById(id).value = "";
         });
         categoryFilter.value = "all";
+        document.getElementById("ledgerSort").value = "newest";
+        document.querySelector(".ledger-advanced-filters")?.removeAttribute("open");
         renderLedger();
     });
     document.getElementById("exportCsvBtn").addEventListener("click", exportLedgerCsv);
@@ -1120,6 +1374,7 @@ function initQuickAddForm() {
 function renderAll() {
     renderGreeting();
     renderBudget();
+    renderFixedCosts();
     renderMonthlyReport();
     renderWeeklyChart();
     renderDonut();

@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard.css?v=20261020-2">
     <link rel="stylesheet" href="css/responsive.css">
 
 </head>
@@ -93,15 +93,25 @@
                 BUDGET
         ========================== -->
 
-        <section class="dash-section">
+        <section class="dash-section dash-overview-grid">
             <div id="budgetContainer"><!-- filled by dashboard.js --></div>
+            <div id="fixedCostsContainer"><!-- filled by dashboard.js --></div>
         </section>
 
         <!-- =========================
                 3D FLIP CHART
         ========================== -->
 
-        <section class="dash-section">
+        <section class="dash-section chart-dashboard-grid">
+
+            <aside class="student-side-note student-side-note-left" aria-label="A student budget reminder">
+                <span class="side-note-orbit orbit-one"><i class="fa-solid fa-mug-hot"></i></span>
+                <span class="side-note-orbit orbit-two"><i class="fa-solid fa-book-open"></i></span>
+                <div class="side-note-icon"><i class="fa-solid fa-seedling"></i></div>
+                <span class="side-note-kicker">A small reminder</span>
+                <h3>Progress beats perfection.</h3>
+                <p>A few honest entries are more useful than a perfect budget you never open.</p>
+            </aside>
 
             <div class="chart-scene">
 
@@ -140,6 +150,15 @@
                 </div>
 
             </div>
+
+            <aside class="student-side-note student-side-note-right" aria-label="A student budget reminder">
+                <span class="side-note-orbit orbit-three"><i class="fa-solid fa-house"></i></span>
+                <span class="side-note-orbit orbit-four"><i class="fa-solid fa-bus"></i></span>
+                <div class="side-note-icon"><i class="fa-solid fa-heart"></i></div>
+                <span class="side-note-kicker">Keep it balanced</span>
+                <h3>Essentials first. You still get to live.</h3>
+                <p>Your budget is here to help you make choices, not make you feel guilty.</p>
+            </aside>
 
         </section>
 
@@ -216,11 +235,16 @@
                         <option value="highest">Highest amount</option>
                         <option value="lowest">Lowest amount</option>
                     </select>
+                    <details class="ledger-advanced-filters">
+                        <summary><i class="fa-solid fa-sliders"></i> More filters</summary>
+                        <div class="ledger-advanced-grid">
                     <label class="filter-date">From <input type="date" id="ledgerDateFrom" aria-label="Start date"></label>
                     <label class="filter-date">To <input type="date" id="ledgerDateTo" aria-label="End date"></label>
                     <label class="filter-amount">Min ₹ <input type="number" id="ledgerMinAmount" min="0" step="1" placeholder="0" aria-label="Minimum amount"></label>
                     <label class="filter-amount">Max ₹ <input type="number" id="ledgerMaxAmount" min="0" step="1" placeholder="Any" aria-label="Maximum amount"></label>
                     <button type="button" class="btn btn-ghost clear-filters-btn" id="clearLedgerFilters">Clear filters</button>
+                        </div>
+                    </details>
                 </div>
 
                 <div id="ledgerList"><!-- filled by dashboard.js --></div>
@@ -290,7 +314,7 @@
 
     <script src="js/theme.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/dashboard.js"></script>
+    <script src="js/dashboard.js?v=20261020-2"></script>
 
 </body>
 </html>
