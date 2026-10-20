@@ -1141,6 +1141,10 @@
 
 @media(max-width:768px){
 
+    .dash-main{padding:116px 5% 64px;}
+    .dash-section{margin-bottom:24px;}
+    .dash-head{margin-bottom:24px;}
+    .dash-head h1{font-size:clamp(27px,6vw,32px);}
     .dash-overview-grid{grid-template-columns:1fr;}
     .chart-dashboard-grid{grid-template-columns:1fr;grid-template-areas:"chart" "left" "right";}
     .chart-scene{grid-area:chart;}
@@ -1174,14 +1178,10 @@
         grid-template-columns:repeat(2,1fr);
     }
 
-    .quickadd-row{
-        flex-direction:column;
-        width:100%;
-    }
-
-    .quickadd-submit{
-        width:100%;
-    }
+    .quickadd-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;width:100%;}
+    .quickadd-item-field{grid-column:1 / -1;}
+    .quickadd-price-field{grid-column:1;}
+    .quickadd-submit{grid-column:2;width:auto;min-width:96px;padding:0 20px;align-self:end;}
 
     .budget-empty{
         flex-direction:column;
@@ -1189,8 +1189,11 @@
     }
 
     .chart-card{
-        height:400px;
+        height:380px;
+        touch-action:pan-y;
     }
+
+    .chart-face{padding:26px 24px;}
 }
 
 @media(max-width:520px){
@@ -1226,7 +1229,7 @@
     }
 
     .dash-main{
-        padding-top:130px;
+        padding:108px 16px 52px;
     }
 
     .budget-card, .quickadd-card, .ledger-card-lg{
@@ -1250,9 +1253,19 @@
         grid-template-columns:1fr 1fr;
     }
 
-    .chart-card{
-        height:460px;
-    }
+    .chart-card{height:360px;}
+    .chart-face{padding:21px 17px;}
+    .chart-face-head h3{font-size:16px;}
+    .chart-back .donut-wrap{width:148px;height:148px;margin:2px auto 10px;}
+    .chart-back .donut-center b{font-size:16px;}
+    .chart-back .donut-legend{grid-template-columns:1fr;max-height:76px;}
+    .chart-hint{font-size:11.5px;margin-bottom:12px;}
+    .student-side-note{display:none;}
+    .quickadd-card{padding:22px 18px;}
+    .quickadd-card > p{margin-bottom:15px;}
+    .ledger-advanced-filters summary{min-height:42px;}
+    .ledger-row-actions{gap:0;}
+    .ledger-edit-btn,.ledger-delete-btn{width:32px;height:38px;}
 
     .chart-dashboard-grid{gap:14px;}
 }
