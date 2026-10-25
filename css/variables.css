@@ -10,6 +10,9 @@
     --color-surface:#FFFFFF;
     --color-surface-alt:#F4F1FB;
     --color-border:#E5E0F2;
+    --color-pattern:rgba(37,99,235,.10);
+    --color-glow-primary:rgba(37,99,235,.08);
+    --color-glow-accent:rgba(16,185,129,.07);
 
     /* ---- brand: indigo/violet instead of generic SaaS blue ---- */
     --color-primary:#6D5EF5;
@@ -72,40 +75,43 @@
 
 :root[data-theme="dark"]{
 
-    --color-bg:#0F0A1A;
-    --color-surface:#181025;
-    --color-surface-alt:#211732;
-    --color-border:#352A4A;
+    --color-bg:#11141D;
+    --color-surface:#1A1E29;
+    --color-surface-alt:#242936;
+    --color-border:#343A4A;
+    --color-pattern:rgba(159,174,229,.055);
+    --color-glow-primary:rgba(135,119,235,.13);
+    --color-glow-accent:rgba(70,183,161,.09);
 
-    --color-primary:#9083FF;
-    --color-primary-dark:#6D5EF5;
-    --color-primary-light:#AFA4FF;
-    --color-primary-tint:rgba(144,131,255,.18);
+    --color-primary:#A99BFF;
+    --color-primary-dark:#8172E8;
+    --color-primary-light:#C2B8FF;
+    --color-primary-tint:rgba(169,155,255,.14);
 
-    --color-accent:#2DD4BF;
-    --color-accent-tint:rgba(45,212,191,.18);
-    --color-warning:#FBBF24;
-    --color-warning-tint:rgba(245,158,11,.18);
-    --color-danger:#FB7185;
-    --color-danger-tint:rgba(244,63,94,.18);
+    --color-accent:#55D6C2;
+    --color-accent-tint:rgba(85,214,194,.14);
+    --color-warning:#F0C36D;
+    --color-warning-tint:rgba(240,195,109,.14);
+    --color-danger:#FF8292;
+    --color-danger-tint:rgba(255,130,146,.14);
 
-    --color-ink:#F3EFFA;
-    --color-slate:#AB9FC7;
-    --color-slate-light:#6F6485;
+    --color-ink:#F1F3FA;
+    --color-slate:#B1B7C8;
+    --color-slate-light:#858DA2;
 
-    --shadow-sm:0 8px 20px rgba(0,0,0,.35);
-    --shadow-md:0 20px 40px rgba(0,0,0,.4);
-    --shadow-lg:0 30px 60px rgba(0,0,0,.5);
+    --shadow-sm:0 8px 22px rgba(0,0,0,.22);
+    --shadow-md:0 20px 42px rgba(0,0,0,.3);
+    --shadow-lg:0 30px 60px rgba(0,0,0,.4);
 
-    --glass-navbar-bg:rgba(24,16,37,.75);
-    --glass-navbar-border:rgba(255,255,255,.08);
-    --glass-mobile-menu-bg:rgba(24,16,37,.97);
-    --glass-card-start:rgba(33,23,50,.78);
-    --glass-card-end:rgba(15,10,26,.5);
-    --glass-card-border:rgba(255,255,255,.08);
-    --glass-card-shine:rgba(255,255,255,.05);
-    --glass-card-inset:rgba(255,255,255,.05);
-    --glass-flip-btn-bg:rgba(255,255,255,.08);
+    --glass-navbar-bg:rgba(26,30,41,.82);
+    --glass-navbar-border:rgba(220,226,246,.10);
+    --glass-mobile-menu-bg:rgba(26,30,41,.97);
+    --glass-card-start:rgba(38,44,59,.92);
+    --glass-card-end:rgba(26,30,41,.86);
+    --glass-card-border:rgba(194,184,255,.13);
+    --glass-card-shine:rgba(255,255,255,.055);
+    --glass-card-inset:rgba(255,255,255,.035);
+    --glass-flip-btn-bg:rgba(255,255,255,.055);
 }
 
 *{

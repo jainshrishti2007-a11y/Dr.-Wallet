@@ -23,8 +23,21 @@ function getSession() {
 function setSession(user) {
     localStorage.setItem(
         SESSION_KEY,
-        JSON.stringify({ name: user.name, email: user.email })
+        JSON.stringify({
+            name: user.name,
+            username: user.username || "",
+            displayPreference: user.displayPreference || "name",
+            email: user.email,
+        })
     );
+}
+
+function getSessionDisplayName(session = getSession()) {
+    if (!session) return "";
+    const account = getUsers().find((user) => user.email === session.email) || {};
+    const username = session.username || account.username || "";
+    const preference = session.displayPreference || account.displayPreference || "name";
+    return preference === "username" && username ? username : (session.name || account.name || "");
 }
 
 function clearSession() {
@@ -56,6 +69,7 @@ function showToast(message, type = "success") {
         success: "fa-circle-check",
         error: "fa-circle-exclamation",
         info: "fa-circle-info",
+        warning: "fa-triangle-exclamation",
     };
 
     const toast = document.createElement("div");
@@ -81,11 +95,13 @@ function buildGuestHTML() {
 }
 
 function buildUserMenuHTML(session) {
+    const account = getUsers().find((user) => user.email === session.email) || {};
+    const displayName = session.username || account.username || getSessionDisplayName(session);
     return `
         <div class="user-menu">
             <button type="button" class="user-avatar-btn">
-                <span class="avatar-circle">${getInitials(session.name)}</span>
-                <span class="user-name">${session.name}</span>
+                <span class="avatar-circle">${getInitials(displayName)}</span>
+                <span class="user-name">${displayName}</span>
                 <i class="fa-solid fa-chevron-down"></i>
             </button>
             <div class="user-dropdown">
@@ -182,6 +198,24 @@ function openEditProfileModal() {
                 </div>
 
                 <div class="form-group">
+                    <label>Username <span class="optional-tag">(optional)</span></label>
+                    <input type="text" name="username" value="${user.username || ""}" placeholder="3–30 letters, numbers, or underscores" maxlength="30" autocomplete="username" aria-describedby="editUsernameError">
+                    <span class="error-text" id="editUsernameError" data-error-for="edit-username" aria-live="polite"></span>
+                </div>
+
+                <div class="form-group">
+                    <span class="display-choice-heading">Show on dashboard and profile</span>
+                    <label class="display-choice">
+                        <input type="radio" name="displayPreference" value="name" ${(user.displayPreference || "name") === "name" ? "checked" : ""}>
+                        <span>Display name</span>
+                    </label>
+                    <label class="display-choice ${user.username ? "" : "disabled"}">
+                        <input type="radio" name="displayPreference" value="username" ${user.displayPreference === "username" ? "checked" : ""} ${user.username ? "" : "disabled"}>
+                        <span>Username${user.username ? "" : " (not set)"}</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
                     <label>Phone Number</label>
                     <input type="tel" name="phone" value="${user.phone || ""}" required>
                     <span class="error-text" data-error-for="edit-phone"></span>
@@ -220,6 +254,26 @@ function openEditProfileModal() {
         setTimeout(() => overlay.remove(), 250);
     };
 
+    const usernameInput = overlay.querySelector('[name="username"]');
+    const usernameDisplayChoice = overlay.querySelector('input[name="displayPreference"][value="username"]');
+    const usernameDisplayLabel = usernameDisplayChoice.closest(".display-choice");
+    usernameInput.addEventListener("input", () => {
+        const enteredUsername = usernameInput.value.trim();
+        const errorEl = overlay.querySelector('[data-error-for="edit-username"]');
+        const isTaken = enteredUsername && users.some((u) =>
+            u.email !== session.email && (u.username || "").toLowerCase() === enteredUsername.toLowerCase()
+        );
+        const hasUsername = Boolean(enteredUsername || user.username);
+
+        usernameDisplayChoice.disabled = !hasUsername;
+        usernameDisplayLabel.classList.toggle("disabled", !hasUsername);
+        if (!hasUsername && usernameDisplayChoice.checked) {
+            overlay.querySelector('input[name="displayPreference"][value="name"]').checked = true;
+        }
+        errorEl.textContent = isTaken ? "That username is already taken" : "";
+        usernameInput.classList.toggle("input-error", Boolean(isTaken));
+    });
+
     document.getElementById("closeEditModal").addEventListener("click", closeModal);
     document.getElementById("cancelEditModal").addEventListener("click", closeModal);
     overlay.addEventListener("click", (e) => {
@@ -234,7 +288,19 @@ function openEditProfileModal() {
 
         const phone = form.phone.value.trim();
         const pincode = form.pincode.value.trim();
+        const enteredUsername = form.username.value.trim();
+        const username = enteredUsername || user.username || "";
         let valid = true;
+
+        if (enteredUsername && !/^[a-zA-Z0-9_]{3,30}$/.test(enteredUsername)) {
+            form.querySelector('[data-error-for="edit-username"]').textContent = "Use 3–30 letters, numbers, or underscores";
+            valid = false;
+        } else if (enteredUsername && users.some((u) =>
+            u.email !== session.email && (u.username || "").toLowerCase() === enteredUsername.toLowerCase()
+        )) {
+            form.querySelector('[data-error-for="edit-username"]').textContent = "That username is already taken";
+            valid = false;
+        }
 
         if (!/^[6-9]\d{9}$/.test(phone)) {
             form.querySelector('[data-error-for="edit-phone"]').textContent = "Enter a valid 10-digit mobile number";
@@ -253,6 +319,8 @@ function openEditProfileModal() {
                 ? {
                       ...u,
                       name: form.name.value.trim(),
+                      username,
+                      displayPreference: form.displayPreference.value,
                       phone,
                       pincode,
                       college: form.college.value.trim(),
@@ -262,7 +330,8 @@ function openEditProfileModal() {
         );
 
         saveUsers(updated);
-        setSession({ name: form.name.value.trim(), email: session.email });
+        const updatedUser = updated.find((u) => u.email === session.email);
+        setSession(updatedUser);
 
         closeModal();
         renderAuthSlot();

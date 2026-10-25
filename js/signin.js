@@ -29,20 +29,15 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         clearSigninErrors(form);
 
-        const name = form.name.value.trim();
-        const email = form.email.value.trim().toLowerCase();
+        const identifier = form.identifier.value.trim();
+        const normalizedIdentifier = identifier.toLowerCase();
         const password = form.password.value;
         const captchaInput = form.captcha.value;
 
         let valid = true;
 
-        if (name.length < 2) {
-            setSigninError("name", "Enter your full name");
-            valid = false;
-        }
-
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            setSigninError("email", "Enter a valid email address");
+        if (!identifier) {
+            setSigninError("identifier", "Enter your username or email address");
             valid = false;
         }
 
@@ -64,15 +59,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const users = getUsers();
-        const user = users.find((u) => u.email === email);
+        const user = users.find((u) =>
+            (u.email || "").toLowerCase() === normalizedIdentifier ||
+            (u.username || "").toLowerCase() === normalizedIdentifier
+        );
 
-        const matches =
-            user &&
-            user.password === password &&
-            user.name.toLowerCase() === name.toLowerCase();
+        const matches = user && user.password === password;
 
         if (!matches) {
-            setSigninError("password", "Name, email or password is incorrect");
+            setSigninError("password", "Username/email or password is incorrect");
             renderCaptcha("captchaText");
             form.captcha.value = "";
             showToast("Login failed. Please check your details.", "error");

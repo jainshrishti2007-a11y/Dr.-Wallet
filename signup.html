@@ -45,9 +45,10 @@
             </label>
 
             <ul class="nav-links">
-                <li><a href="home.html">Home</a></li>
-                <li><a href="home.html#about">About</a></li>
+                <li><a href="home.html#home">Home</a></li>
+                <li><a href="about.html">About</a></li>
                 <li><a href="home.html#features">Features</a></li>
+                <li><a href="home.html#tracker">Tracker</a></li>
                 <li><a href="contact.html">Contact</a></li>
                 <li class="mobile-auth-slot">
                     <div id="authSlotMobile"></div>
@@ -89,6 +90,12 @@
                         <label for="name">Full Name *</label>
                         <input type="text" id="name" name="name" placeholder="e.g. Sukbir Singh Badal" autocomplete="name">
                         <span class="error-text" data-error-for="name"></span>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="username">Username *</label>
+                        <input type="text" id="username" name="username" placeholder="Choose a unique username" autocomplete="username" maxlength="30" aria-describedby="usernameError">
+                        <span class="error-text" id="usernameError" data-error-for="username" aria-live="polite"></span>
                     </div>
 
                     <div class="form-group full">
